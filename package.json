@@ -8,7 +8,8 @@
     "dev": "npm run dev --prefix ./client",
     "build": "npm run build --prefix ./client",
     "preview": "npm run preview --prefix ./client",
-    "check": "npm run check --prefix ./client"
+    "check": "npm run check --prefix ./client",
+    "sdev": "tsc --watch --project ./server/"
   },
   "author": "4Sight",
   "license": "MIT",
@@ -22,5 +23,8 @@
     "tslib": "^2.6.2",
     "typescript": "^5.4.5",
     "vite": "^5.1.4"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
   }
 }
