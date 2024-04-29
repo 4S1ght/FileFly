@@ -15,11 +15,22 @@ const ZConfig = object({
     // Security
     use_https: boolean(),
     ssl_source_type: union([
-        literal('self-signed-'),
+        literal('self-signed'),
         literal('external')
     ]),
     ssl_external_cert: string().optional(),
     ssl_external_pkey: string().optional(),
+    ssl_lifetime_days: number(),
+    ssl_alg: union([
+        literal('sha256'),
+        literal('sha384'),
+        literal('sha512')
+    ]),
+    ssl_key_size: number(),
+    ssl_common_name: string(),
+    ssl_country_name: string(),
+    ssl_locality_name: string(),
+    ssl_organization_name: string(),
 })
 
 type TConfig = z.infer<typeof ZConfig>
@@ -31,7 +42,7 @@ export default class Config {
     public static declare $: TConfig
     public static yamlFile = path.join(__dirname, '../../../../server.yaml')
 
-    public static async load() {
+    public static async load(): EavSingle<ConfigParseError> {
         try {
 
             const text = await fs.readFile(this.yamlFile, 'utf-8')
@@ -39,36 +50,35 @@ export default class Config {
             const parseResult = ZConfig.safeParse(config)
             this.$ = config
 
-            if (!parseResult.error) return
+            if (!parseResult.error) return;
+
             throw parseResult.error.issues.map(x => {
                 return `<${x.path}> (${x.code}) Message: ${x.message}`
             })
 
         } 
         catch (error) {
-            throw new this.ConfigParseError(error)
+            return new ConfigParseError(error) 
         }
     }
+}
+class ConfigParseError extends Error {
 
-    private static ConfigParseError = class ConfigParseError extends Error {
+    public configurationFile = Config.yamlFile
 
-        public configurationFile = Config.yamlFile
+    constructor(parseError: any) {
+        super()
+        this.name = c.red(this.constructor.name)
+        this.message = parseError.message || c.red(`An error was encountered while parsing server configuration.`)
+        Error.captureStackTrace(this)
 
-        constructor(parseErrors: any) {
-            super()
-            this.name = c.red(this.constructor.name)
-            this.message = c.red(`An error was encountered while parsing server configuration.`)
-            Error.captureStackTrace(this)
-
-            if (Array.isArray(parseErrors)) {
-                this.message += '\n    > ' +
-                    parseErrors.map(x => c.yellow(x))
-                    .join('\n')
-                    + '\n'
-            }
-
+        if (Array.isArray(parseError)) {
+            this.message += '\n    > ' +
+            parseError.map(x => c.yellow(x))
+                .join('\n')
+                + '\n'
         }
-        
-    }
 
+    }
+    
 }

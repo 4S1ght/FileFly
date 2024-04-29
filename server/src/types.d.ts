@@ -26,3 +26,5 @@ declare type Eav<V, E = Error> = [E, undefined] | [undefined, V]
  * ```
  */
 declare type EavAsync<V, E = Error> = Promise<[E, undefined] | [undefined, V]>
+
+declare type EavSingle<E = Error> = Promise<E | undefined>
