@@ -11,6 +11,16 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
 // Types ======================================================================
 
+const ZLogLevel = union([
+    literal('crit'),
+    literal('error'),
+    literal('warn'),
+    literal('notice'),
+    literal('info'),
+    literal('http'),
+    literal('debug')
+])
+
 const ZConfig = object({
     // Security
     use_https: boolean(),
@@ -31,6 +41,10 @@ const ZConfig = object({
     ssl_country_name: string(),
     ssl_locality_name: string(),
     ssl_organization_name: string(),
+    log_console_level: ZLogLevel,
+    log_file_level: ZLogLevel,
+    log_file_size: union([ number(), string() ]),
+    log_files: union([ number(), string() ]),
 })
 
 type TConfig = z.infer<typeof ZConfig>
@@ -53,7 +67,7 @@ export default class Config {
             if (!parseResult.error) return;
 
             throw parseResult.error.issues.map(x => {
-                return `<${x.path}> (${x.code}) Message: ${x.message}`
+                return `<${x.path}> (${x.code}) Error: ${x.message}`
             })
 
         } 
@@ -75,8 +89,7 @@ class ConfigParseError extends Error {
         if (Array.isArray(parseError)) {
             this.message += '\n    > ' +
             parseError.map(x => c.yellow(x))
-                .join('\n')
-                + '\n'
+                .join('\n    > ')
         }
 
     }

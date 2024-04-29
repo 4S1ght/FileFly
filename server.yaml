@@ -2,6 +2,7 @@
 # It can be edited from within the server UI or manually - in which case
 # a server restart is needed.
 
+
 # Security ====================================================================
 
 # Defines whether to use HTTPS (encrypted) or HTTP (unencrypted) connections.
@@ -49,3 +50,21 @@ ssl_locality_name: N/A
 # Certificate owner's organization.
 ssl_organization_name: N/A
 
+
+# Logging ====================================================================
+
+# Specifies the level of logs emitted to the server console.
+# Levels include - crit, error, warn, notice, info, http, debug
+log_console_level: http
+
+# Specifies the level of logs emitted to log files.
+# Levels include - crit, error, warn, notice, info, http, debug
+log_file_level: info
+
+# Specifies the maximum size of each log file.
+log_file_size: 100MB
+
+# Specifies the maximum amount of log files stored.
+# This can be a number of files or number of days. If using days, add 'd' 
+# as the suffix.
+log_files: 7d

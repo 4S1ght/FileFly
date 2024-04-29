@@ -2,6 +2,7 @@
 
 import HttpServer from "./lib/api/httpServer.js"
 import Config from "./lib/config/config.js"
+import Logger from "./lib/logging/logging.js"
 
 // Types ======================================================================
 
@@ -15,9 +16,13 @@ export default class Server {
         const e1 = await Config.load()
         if (e1) throw e1
 
+        // Logging
+        const e2 = await Logger.init()
+        if (e2) throw e2
 
-        const e2 = await HttpServer.start()
-        if (e1) throw e1
+        // HTTP server
+        const e3 = await HttpServer.start()
+        if (e3) throw e3
 
     }
 
