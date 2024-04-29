@@ -1,18 +1,17 @@
 // Imports ====================================================================
 
-import fs from 'fs/promises'
-import path from 'path'
-import yaml from 'js-yaml'
+import Config from "./lib/config/config.js"
 
 // Types ======================================================================
 
 // Code =======================================================================
 
-export default class Config {
+export default class Server {
 
-    public static async load() {
-
-
+    public static async start() {
+        await Config.load()
     }
 
 }
+
+Server.start()

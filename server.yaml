@@ -1,21 +1,19 @@
-# Server configuration ========================================================
+# Security ====================================================================
 
 # Defines whether to use HTTPS (encrypted) or HTTP (unencrypted) connections.
 # Turning this setting off may expose the server's user information, passwords,
 # session IDs and other sensitive information. 
 use_https: true
 
-# Security ====================================================================
-
 # Specifies where to source the SSL certificate from.
 # Available options include:
-# 1. self-signed - THe server will generate its own SSL encryption certificates.
-# 2. external - The server will use an external certificate and private key
-#    supplied by the user.
+# 1. self-signed - The server will generate its own SSL encryption certificates.
+# 2. external - The server will use an external certificate and private key.
+#    Use "ssl_external_cert" and "ssl_external_pkey" to specify their location.
 ssl_source_type: self-signed
 
-# Specifies the location of an external SSL certificate.
+# Specifies the absolute path of an external SSL certificate.
 # ssl_external_cert: /etc/ssl/certs/cert.pwm
 
-# Specifies the location of an external SSL private key.
+# Specifies the absolute path of an external SSL private key.
 # ssl_external_pkey: /etc/ssl/certs/pkey.pem
