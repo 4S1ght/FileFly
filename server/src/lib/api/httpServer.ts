@@ -30,9 +30,6 @@ export default class HttpServer {
             try {
                 
                 if (Config.$.use_https) {
-
-                    out.INFO(`Server running in HTTPS mode`)
-
                     await SSL.init()
                     const [certError, sslData] = await SSL.getSSLCertKeyData()
                     if (certError) throw certError
@@ -40,12 +37,11 @@ export default class HttpServer {
                     const options: https.ServerOptions = { ...sslData }
                     this.server = https.createServer(options, this.app)
 
+                    out.INFO(`Mode: HTTPS`)
                 }
                 else {
-
-                    out.WARN(`Server running in HTTP mode`)
                     this.server = http.createServer(this.app)
-
+                    out.WARN(`Mode: HTTP`)
                 }
 
                 this.finishAPISetup()

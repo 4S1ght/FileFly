@@ -57,7 +57,7 @@ ssl_organization_name: N/A
 
 # Specifies the level of logs emitted to the server console.
 # Levels include - crit, error, warn, notice, info, http, debug
-log_console_level: http
+log_console_level: debug
 
 # Specifies the level of logs emitted to log files.
 # Levels include - crit, error, warn, notice, info, http, debug

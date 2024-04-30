@@ -3,6 +3,7 @@
 import HttpServer from "./lib/api/httpServer.js"
 import Config from "./lib/config/config.js"
 import Logger from "./lib/logging/logging.js"
+import userAccounts from "./lib/db/userAccounts.js"
 
 // Types ======================================================================
 
@@ -20,9 +21,13 @@ export default class Server {
         const e2 = await Logger.init()
         if (e2) throw e2
 
-        // HTTP server
-        const e3 = await HttpServer.start()
+        // User accounts database
+        const e3 = await userAccounts.open()
         if (e3) throw e3
+
+        // HTTP server
+        const e4 = await HttpServer.start()
+        if (e4) throw e4
 
     }
 
