@@ -47,7 +47,7 @@ export default new class SSL {
 
     }
 
-    public async generateSSLCert(): EavSingle {
+    public async generateSSLCert(): EavSingleAsync {
         try {
 
             const ssl = await generateX509Cert({

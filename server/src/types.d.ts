@@ -1,4 +1,3 @@
-
 /**
  * Error-as-value return type.  
  * Used together with array destructuring to produce a Go-like return returns.
@@ -27,4 +26,15 @@ declare type Eav<V, E = Error> = [E, undefined] | [undefined, V]
  */
 declare type EavAsync<V, E = Error> = Promise<[E, undefined] | [undefined, V]>
 
-declare type EavSingle<E = Error> = Promise<E | undefined>
+/**
+ * An error-as-value return type for functions that don't have to
+ * return any information and would benefit being error-safe.
+ */
+
+declare type EavSingle<E = Error> = E | undefined
+
+/**
+ * An async error-as-value return type for functions that don't have to
+ * return any information and would benefit being error-safe.
+ */
+declare type EavSingleAsync<E = Error> = Promise<E | undefined>

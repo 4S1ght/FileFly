@@ -49,7 +49,7 @@ export default new class Logger {
     }
     
 
-    public async init(): EavSingle {
+    public async init(): EavSingleAsync {
         try {
             this.winston = winston.createLogger({
                 levels: {

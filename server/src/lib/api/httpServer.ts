@@ -18,7 +18,7 @@ export default class HttpServer {
     
     private constructor() {}
 
-    public static async start(): EavSingle {
+    public static async start(): EavSingleAsync {
 
         if (Config.$.use_https) {
 

@@ -56,7 +56,7 @@ export default class Config {
     public static declare $: TConfig
     public static yamlFile = path.join(__dirname, '../../../../server.yaml')
 
-    public static async load(): EavSingle<ConfigParseError> {
+    public static async load(): EavSingleAsync<ConfigParseError> {
         try {
 
             const text = await fs.readFile(this.yamlFile, 'utf-8')
