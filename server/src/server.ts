@@ -10,7 +10,7 @@ import Logger from "./lib/logging/logging.js"
 
 export default class Server {
 
-    public static async start() {
+    public static async main() {
 
         // Server configuration
         const e1 = await Config.load()
@@ -28,4 +28,4 @@ export default class Server {
 
 }
 
-Server.start()
+Server.main()

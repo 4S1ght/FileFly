@@ -13,7 +13,7 @@ function toPositiveHex(hex: string) {
     return mostSignificantHexAsInt.toString() + hex.substring(1)
 }
 
-interface X509Options {
+export interface X509Options {
     /** Certificate validity duration */
     days: number
     /** Certificate/key size in bits */

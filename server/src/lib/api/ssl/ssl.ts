@@ -5,10 +5,13 @@ import path from 'path'
 import url from 'url'
 import c from 'chalk'
 import Config from '../../config/config.js'
-import generateX509Cert from './x509.js'
+import generateX509Cert, { X509Options } from './x509.js'
+import Logger from '../../logging/logging.js'
 
 const __filename = url.fileURLToPath(import.meta.url)
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+
+const out = Logger.getScope(import.meta.url)
 
 // Types ======================================================================
 
@@ -26,6 +29,9 @@ export default new class SSL {
 
     public async init() {
 
+        out.DEBUG(`SSL init`)
+        out.DEBUG(`SSL dir: ${this.sslFolder}`)
+
         this.certRegenInterval = 1 // days
         this.certRegenThreshold = 10 // days
 
@@ -35,6 +41,11 @@ export default new class SSL {
         // if the old one is not there, is outdated or is near the end of its lifespan
         const generate = async () => {
             if (await this.shouldRegenerateCert()) {
+                const timestamp = await this.getTimestamp()
+                out.DEBUG(
+                    `Cert.init > timestamp valid until ${c.blue(timestamp ? new Date(timestamp) : "N/A")} ` +
+                    `(${timestamp ? ('~'+((timestamp - Date.now()) / 86400000).toFixed(2)) : 0} days)`
+                )
                 await this.generateSSLCert()
             }
         }
@@ -50,19 +61,32 @@ export default new class SSL {
     public async generateSSLCert(): EavSingleAsync {
         try {
 
-            const ssl = await generateX509Cert({
-                days:             Config.$.ssl_lifetime_days,
-                alg:              Config.$.ssl_alg,
-                keySize:          Config.$.ssl_key_size,
-                commonName:       Config.$.ssl_common_name,
-                countryName:      Config.$.ssl_country_name,
-                localityName:     Config.$.ssl_locality_name,
+            const config: X509Options = {
+                days: Config.$.ssl_lifetime_days,
+                alg: Config.$.ssl_alg,
+                keySize: Config.$.ssl_key_size,
+                commonName: Config.$.ssl_common_name,
+                countryName: Config.$.ssl_country_name,
+                localityName: Config.$.ssl_locality_name,
                 organizationName: Config.$.ssl_organization_name
-            })
+            }
 
+            out.WARN('Cert.generateSSLCert getting new ssl cert/key pair')
+            out.DEBUG(`Cert.generateSSLCert config`, JSON.stringify(config))
+
+            const ssl = await generateX509Cert(config)
+
+            out.DEBUG(`Cert.generateSSLCert writing SSL cert - ${c.blue(this.certPem)}`)
             await fs.writeFile(this.certPem, ssl.cert)
+
+            out.DEBUG(`Cert.generateSSLCert writing private key - ${c.blue(this.pratekeyPem)}`)
             await fs.writeFile(this.pratekeyPem, ssl.privateKey)
-            await this.setTimestamp()
+            
+            // Update .timestamp file
+            const validUntil = await this.setTimestamp()
+
+            out.NOTICE('Cert.generateSSLCert finished successfully')
+            out.NOTICE(`New SSL certificate valid until ${c.blue(new Date(validUntil))}`)
             
         } 
         catch (error) {
@@ -73,12 +97,14 @@ export default new class SSL {
     public async getSSLCertKeyData(): EavAsync<{ cert: string, key: string }> {
         try {
             if (Config.$.ssl_source_type === 'external') {
+                out.INFO('Using external SSL certificate')
                 return [undefined, {
                     cert: await fs.readFile(Config.$.ssl_external_cert!, 'utf-8'),
                     key: await fs.readFile(Config.$.ssl_external_cert!, 'utf-8')
                 }]
             }
             else {
+                out.WARN('Using self-signed SSL certificate')
                 return [undefined, {
                     cert: await fs.readFile(this.certPem, 'utf-8'),
                     key: await fs.readFile(this.pratekeyPem, 'utf-8')

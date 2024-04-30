@@ -10,6 +10,8 @@
 # session IDs and other sensitive information. 
 use_https: true
 
+http_port: 443
+
 # Specifies where to source the SSL certificate from.
 # Available options include:
 # 1. self-signed - The server will generate its own SSL encryption certificates.

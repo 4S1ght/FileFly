@@ -48,7 +48,6 @@ export default new class Logger {
         })
     }
     
-
     public async init(): EavSingleAsync {
         try {
             this.winston = winston.createLogger({
@@ -94,8 +93,7 @@ export default new class Logger {
 
         const relativeScope =  url.fileURLToPath(scope)
             .replace(path.join(__dirname, '../../../'), '')
-            .replace(/\\|\//g, '.')
-            .replace('.js', '')
+            .replace(/\\|\//g, '/')
 
         const mapMessage = (message: (string|object)[]) => message.map(x => {
             if (x instanceof Error) return `${x.message} \n${x.stack}`

@@ -24,6 +24,7 @@ const ZLogLevel = union([
 const ZConfig = object({
     // Security
     use_https: boolean(),
+    http_port: number(),
     ssl_source_type: union([
         literal('self-signed'),
         literal('external')
@@ -41,6 +42,7 @@ const ZConfig = object({
     ssl_country_name: string(),
     ssl_locality_name: string(),
     ssl_organization_name: string(),
+    // Logging
     log_console_level: ZLogLevel,
     log_file_level: ZLogLevel,
     log_file_size: union([ number(), string() ]),
