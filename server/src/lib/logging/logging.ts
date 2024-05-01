@@ -30,18 +30,22 @@ export default new class Logger {
     }
 
     private labelsColored: Record<string, string> = {
-        crit:   c.redBright('CRIT'),
-        error:  c.redBright('ERRO'),
-        warn:   c.yellowBright('WARN'),
-        notice: c.blueBright('NOTE'),
-        info:   c.whiteBright('INFO'),
-        http:   c.cyanBright('HTTP'),
-        debug:  c.magentaBright('DEBG')
+        crit:   c.red('CRIT'),
+        error:  c.red('ERRO'),
+        warn:   c.yellow('WARN'), 
+        notice: c.cyan('NOTE'),
+        info:   c.white('INFO'),
+        http:   c.blue('HTTP'),
+        debug:  c.magenta('DEBG')
+    }
+
+    private criticalLevels: Record<string, true> = {
+        crit: true, error: true
     }
 
     private formats = {
         console: winston.format.printf(x => {
-            return `${c.grey(x.timestamp)} ${this.labelsColored[x.level]} ${c.grey("["+x["0"]+"]")} ${x.level === 'error' ? c.red(x.message) : x.message}`
+            return `${c.grey(x.timestamp)} ${this.labelsColored[x.level]} ${c.grey("["+x["0"]+"]")} ${this.criticalLevels[x.level] ? c.red(x.message) : x.message}`
         }),
         file: winston.format.printf(x => {
             return `${x.timestamp} ${this.labels[x.level]} [${x["0"]}] ${x.message}`.replace(/\x1B\[\d+m/g, '')
@@ -58,7 +62,7 @@ export default new class Logger {
                     notice: 3,
                     info:   4,
                     http:   5,
-                    debug:  6
+                    debug:  6 
                 },
                 format: winston.format.combine(
                     winston.format.timestamp(),

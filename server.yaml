@@ -5,6 +5,7 @@
 
 # Security ====================================================================
 
+
 # Defines whether to use HTTPS (encrypted) or HTTP (unencrypted) connections.
 # Turning this setting off may expose the server's user information, passwords,
 # session IDs and other sensitive information. 
@@ -13,13 +14,12 @@ use_https: true
 http_port: 443
 
 # Specifies where to source the SSL certificate from.
-# Available options include:
+# Available options are:
 # 1. self-signed - The server will generate its own SSL encryption certificates.
 # 2. external - The server will use an external certificate and private key.
 #    Use "ssl_external_cert" and "ssl_external_pkey" to specify their location.
-#
-# Note: All of the following SSL settings only apply when "ssl_source_type" 
-# is set to "self-signed".
+# Note: All of the following below SSL settings only apply when 
+# "ssl_source_type" is set to "self-signed".
 ssl_source_type: self-signed
 
 # Specifies the absolute path of an external SSL certificate.
@@ -32,8 +32,8 @@ ssl_external_pkey: /etc/ssl/certs/pkey.pem
 # by Filefly whenever it's configured to use a self-signed certificate.
 ssl_lifetime_days: 365
 
-# Specifies the encryption algorithm used.
-# Available options include: sha256, sha384, sha512
+# Specifies the encryption algorithm used for network communication.
+# Available options are: sha256, sha384, sha512
 ssl_alg: sha256
 
 # Specifies the key size - Larger sizes provide higher encryptions strength, 
@@ -52,8 +52,16 @@ ssl_locality_name: N/A
 # Certificate owner's organization.
 ssl_organization_name: N/A
 
+# Salt rounds used when hashing user user passwords
+# This setting does not contribute to overall security, but greatly increases
+# the time a potential attacker would need to guess user passwords 
+# - This also means legitimate login attempts will take longer due to longer
+#   process of hashing the password provided by the user.
+bcrypt_password_salt_rounds: 12
+
 
 # Logging ====================================================================
+
 
 # Specifies the level of logs emitted to the server console.
 # Levels include - crit, error, warn, notice, info, http, debug

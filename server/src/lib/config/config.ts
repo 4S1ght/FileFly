@@ -42,6 +42,7 @@ const ZConfig = object({
     ssl_country_name: string(),
     ssl_locality_name: string(),
     ssl_organization_name: string(),
+    bcrypt_password_salt_rounds: number(),
     // Logging
     log_console_level: ZLogLevel,
     log_file_level: ZLogLevel,
