@@ -2,10 +2,10 @@
 
 import { v1 as uuid } from 'uuid'
 import bcrypt from 'bcrypt'
-import Logger from '../logging/logging.js'
 import url from 'url'
 import path from 'path'
 import fs from 'fs/promises'
+import Logger from '../logging/logging.js'
 import AsyncSqlite3 from '../sql/asyncSqlite3.js'
 import Config from '../config/config.js'
 
@@ -35,18 +35,31 @@ export default new class UserAccounts {
 
             // Open database
             const [dbError, dbInstance] = await AsyncSqlite3.open(filename)
-            if (dbError) throw dbError
+            if (dbError) return dbError
             this.db = dbInstance
 
-            out.DEBUG('Running default SQL DB setup queries.')
+            const prepareError = await this.prepare()
+            if (prepareError) return prepareError
+
+        } 
+        catch (error) {
+            return error as Error
+        }
+    }
+
+    private async prepare() {
+        try {
+
+            out.DEBUG('Preparing database.')
 
             // Enable foreign key constrains
+            out.DEBUG('Prepare > foreign keys')
             const defaultsError = await this.db.run(sql`
                 PRAGMA foreign_keys = ON;
             `)
-            if (defaultsError) throw defaultsError
+            if (defaultsError) return defaultsError
 
-            // Create the main users table
+            out.DEBUG('Prepare > create users table')
             const createError = await this.db.run(sql`
                 CREATE TABLE IF NOT EXISTS users (
                     username        TEXT        PRIMARY KEY UNIQUE NOT NULL,
@@ -57,18 +70,19 @@ export default new class UserAccounts {
                     lastLogin       TIMESTAMP
                 );
             `)
-            if (createError) throw createError
+            if (createError) return createError
 
             // Check whether a root user exists.
+            out.DEBUG('Prepare > count root users')
             const [rootUsersError, rootUsers] = await this.db.get<{ count: number }>(sql`
                 SELECT COUNT(*) AS count FROM users WHERE root = 1;
             `) 
-            if (rootUsersError) throw rootUsersError
+            if (rootUsersError) return rootUsersError
             
             // Create a root account if none exist
             if (rootUsers.count === 0) {
                 
-                out.NOTICE('No ROOT users accounts were found. A default admin account will be created!')
+                out.WARN('No root user accounts were found. A default admin account will be created.')
                 
                 const $uuid = `admin.${uuid()}`
                 const $pwd = await bcrypt.hash('admin', Config.$.bcrypt_password_salt_rounds)
@@ -78,7 +92,7 @@ export default new class UserAccounts {
                     VALUES ('admin', $uuid, $pwd, 1)
                 `, { $pwd, $uuid })
 
-                if (createError) throw createError
+                if (createError) return createError
                 out.CRIT('A default administrator account was created with username/password of admin/admin. Change the password as soon as possible!')
                 
             }
@@ -88,19 +102,18 @@ export default new class UserAccounts {
                     SELECT (password) FROM users
                     WHERE username = "admin"
                 `)
-                if (rootError) throw rootError
+                if (rootError) return rootError
 
                 const match = await bcrypt.compare('admin', root.password)
-                if (match) out.CRIT('The default admin account is using the its default password. Please change it as soon as possible!')
+                if (match) out.CRIT('!!! The "admin" account is using the default password.  Change it as soon as possible !!!')
 
             }
 
         } 
         catch (error) {
-            return error as Error
+            return error as Error    
         }
     }
-
 
 
 }
