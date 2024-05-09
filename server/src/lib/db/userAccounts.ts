@@ -6,7 +6,7 @@ import url from 'url'
 import path from 'path'
 import fs from 'fs/promises'
 import Logger from '../logging/logging.js'
-import AsyncSqlite3 from '../sql/asyncSqlite3.js'
+import AsyncSqlite3 from './sqlite3.js'
 import Config from '../config/config.js'
 
 const out = Logger.getScope(import.meta.url)
@@ -40,6 +40,8 @@ export default new class UserAccounts {
 
             const prepareError = await this.prepare()
             if (prepareError) return prepareError
+
+            out.INFO('Database open.')
 
         } 
         catch (error) {
@@ -105,7 +107,7 @@ export default new class UserAccounts {
                 if (rootError) return rootError
 
                 const match = await bcrypt.compare('admin', root.password)
-                if (match) out.CRIT('!!! The "admin" account is using the default password.  Change it as soon as possible !!!')
+                if (match) out.CRIT('!!! The "admin" account is using the default password. Change it as soon as possible !!!')
 
             }
 

@@ -86,7 +86,7 @@ export default new class SSL {
             const validUntil = await this.setTimestamp()
 
             out.NOTICE('Cert.generateSSLCert finished successfully')
-            out.NOTICE(`New SSL certificate valid until ${c.blue(new Date(validUntil))}`)
+            out.NOTICE(`New SSL certificate valid until ${c.blue(new Date(validUntil))}. Alg: ${config.alg}, key size: ${config.keySize}.`)
             
         } 
         catch (error) {
