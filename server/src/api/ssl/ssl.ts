@@ -5,8 +5,8 @@ import path from 'path'
 import url from 'url'
 import c from 'chalk'
 import Config from '../../config/config.js'
-import generateX509Cert, { X509Options } from './x509.js'
 import Logger from '../../logging/logging.js'
+import generateX509Cert, { X509Options } from './x509.js'
 
 const __filename = url.fileURLToPath(import.meta.url)
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
@@ -22,7 +22,7 @@ export default new class SSL {
     private declare certRegenInterval: number
     private declare certRegenThreshold: number
 
-    private sslFolder   = path.join(__dirname, '../../../../crypto/')
+    private sslFolder   = path.join(__dirname, '../../../crypto/')
     private timestamp   = path.join(this.sslFolder, '.timestamp')
     private certPem     = path.join(this.sslFolder, 'cert.pem')
     private pratekeyPem = path.join(this.sslFolder, 'privatekey.pem')
@@ -44,7 +44,7 @@ export default new class SSL {
                 const timestamp = await this.getTimestamp()
                 out.DEBUG(
                     `Cert.init > timestamp valid until ${c.blue(timestamp ? new Date(timestamp) : "N/A")} ` +
-                    `(${timestamp ? ('~'+((timestamp - Date.now()) / 86400000).toFixed(2)) : 0} days)`
+                    `(${timestamp ? ('~'+((timestamp - Date.now()) / 86400000).toFixed(0)) : 0} days)`
                 )
                 await this.generateSSLCert()
             }
@@ -86,7 +86,10 @@ export default new class SSL {
             const validUntil = await this.setTimestamp()
 
             out.NOTICE('Cert.generateSSLCert finished successfully')
-            out.NOTICE(`New SSL certificate valid until ${c.blue(new Date(validUntil))}. Alg: ${config.alg}, key size: ${config.keySize}.`)
+            out.NOTICE(
+                `New SSL certificate valid until ${c.blue(new Date(validUntil))}. Alg: ${config.alg}, key size: ${config.keySize}.` +
+                `(${((validUntil - Date.now()) / 86400000).toFixed(0)})`
+            )
             
         } 
         catch (error) {

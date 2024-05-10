@@ -57,7 +57,7 @@ type TConfig = z.infer<typeof ZConfig>
 export default class Config {
 
     public static declare $: TConfig
-    public static yamlFile = path.join(__dirname, '../../../../server.yaml')
+    public static yamlFile = path.join(__dirname, '../../../server.yaml')
 
     public static async load(): EavSingleAsync<ConfigParseError> {
         try {

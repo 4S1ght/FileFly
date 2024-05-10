@@ -29,8 +29,8 @@ export default new class UserAccounts {
             
             out.INFO('Opening database.')
 
-            const dirname = path.join(__dirname, '../../../db/')
-            const filename = path.join(__dirname, '../../../db/user.sqlite')
+            const dirname = path.join(__dirname, '../../db/')
+            const filename = path.join(__dirname, '../../db/user.sqlite')
             await fs.mkdir(dirname, { recursive: true })
 
             // Open database
