@@ -34,7 +34,7 @@ export default class AsyncSqlite3 {
     }
 
     /**
-     * Closes the database and returns possible error that might have happened.
+     * Closes the database and returns any possible errors.
      */
     public close = (): EavSingleAsync => new Promise(resolve => {
         this.$.close(error => {
@@ -42,18 +42,28 @@ export default class AsyncSqlite3 {
         })
     })
 
+    /**
+     * Runs a general SQL query and returns possible errors.
+     */
     public run = (sql: string, params: Record<string, any> = {}): EavSingleAsync => new Promise(resolve => {
         this.$.run(sql, params, function(error) {
             resolve(error || undefined)
         })
     })
 
+    /**
+     * Runs a GET SQL query for small items, returning a possible error, or the query results.
+     */
     public get = <Row>(sql: string, params: Record<string, any> = {}): EavAsync<Row> => new Promise(resolve => {
         this.$.get<Row>(sql, params, function(error, row) {
             resolve(error ? [error, undefined] : [undefined, row])
         })
     })
 
+    /**
+     * Runs a getter SQL query for multiple items, storing them in memory.
+     * Returns a possible error, or the query results.
+     */
     public all = <Row>(sql: string, params: Record<string, any> = {}): EavAsync<Row[]> => new Promise(resolve => {
         this.$.all<Row>(sql, params, function(error, rows) {
             resolve(error ? [error, undefined] : [undefined, rows])

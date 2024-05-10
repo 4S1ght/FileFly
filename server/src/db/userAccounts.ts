@@ -6,8 +6,9 @@ import url from 'url'
 import path from 'path'
 import fs from 'fs/promises'
 import Logger from '../logging/logging.js'
-import AsyncSqlite3 from './sqlite3.js'
 import Config from '../config/config.js'
+import AsyncSqlite3 from './sqlite3.js'
+import Sqlite3TxQueue from './sqlite3TxQueue.js'
 
 const out = Logger.getScope(import.meta.url)
 
@@ -22,6 +23,7 @@ const sql = (s: TemplateStringsArray) => s[0]
 
 export default new class UserAccounts {
 
+    private txq = new Sqlite3TxQueue()
     private declare db: AsyncSqlite3
 
     public async open(): EavSingleAsync {
@@ -46,7 +48,7 @@ export default new class UserAccounts {
         } 
         catch (error) {
             return error as Error
-        }
+        } 
     }
 
     private async prepare() {
