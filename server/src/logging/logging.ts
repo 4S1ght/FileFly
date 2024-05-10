@@ -96,7 +96,7 @@ export default new class Logger {
     public getScope(scope: string) {
 
         const relativeScope =  url.fileURLToPath(scope)
-            .replace(path.join(__dirname, '../../'), '')
+            .replace(path.join(__dirname, '../'), '')
             .replace(/\\|\//g, '/')
 
         const mapMessage = (message: (string|object)[]) => message.map(x => {
