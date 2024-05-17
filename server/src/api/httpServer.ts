@@ -1,29 +1,35 @@
 // Imports ====================================================================
 
-import http from 'http'
-import https from 'https'
-import express from 'express'
-import Config from '../config/config.js'
-import SSL from './ssl/ssl.js'
-import logging from '../logging/logging.js'
-import bodyParser from 'body-parser'
-import cookieParser from 'cookie-parser'
+import url           from 'url'
+import path          from 'path'
+import http          from 'http'
+import https         from 'https'
+import express       from 'express'
+import Config        from '../config/config.js'
+import SSL           from './ssl/ssl.js'
+import logging       from '../logging/logging.js'
+import bodyParser    from 'body-parser'
+import cookieParser  from 'cookie-parser'
 import requestLogger from './middleware/requestLogger.js'
 
 const out = logging.getScope(import.meta.url)
 
+const __filename = url.fileURLToPath(import.meta.url)
+const __dirname  = url.fileURLToPath(new URL('.', import.meta.url))
+
 // Types ======================================================================
 
-export type TMiddleware = (req: express.Request, res: express.Response, next: express.NextFunction) => any
+export type TMiddleware     = (req: express.Request, res: express.Response, next: express.NextFunction) => any
 export type TRequestHandler = (req: express.Request, res: express.Response) => any
 
 // Code =======================================================================
 
 export default class HttpServer {
 
-    public static $: HttpServer
+    public  static $: HttpServer
     private static app = express()
     private static server: http.Server | https.Server
+    private static clientApp = path.join(__dirname, '../../../client')
 
     public static start(): EavSingleAsync {
         return new Promise(async finish => {
@@ -43,7 +49,7 @@ export default class HttpServer {
                     this.server = http.createServer(this.app)
                     out.WARN(`Mode: HTTP`)
                 }
-
+                
                 this.finishAPISetup()
         
                 this.server.listen(Config.$.http_port, () => {
@@ -60,6 +66,9 @@ export default class HttpServer {
 
     private static finishAPISetup() {
 
+        // Only run static server in deployment, in development, Svelte dev server proxy is used for the API access
+        process.env.NODE_ENV === 'production' && this.app.use(express.static(this.clientApp))
+        
         this.app.use(bodyParser.json())
         this.app.use(cookieParser())
         this.app.use(requestLogger.logger)

@@ -12,7 +12,7 @@
         "preview": "npm run preview --prefix ./client",
         "check": "npm run check --prefix ./client",
         "sdev": "tsc --watch --project ./server/",
-        "debug": "node --enable-source-maps ./build/server/server.js"
+        "debug": "nodemon --enable-source-maps ./build/server/server.js"
     },
     "devDependencies": {
         "@sveltejs/vite-plugin-svelte": "^3.0.2",
@@ -24,6 +24,7 @@
         "@types/node": "^20.12.7",
         "@types/node-forge": "^1.3.11",
         "@types/uuid": "^9.0.8",
+        "nodemon": "^3.1.0",
         "sass": "^1.75.0",
         "svelte": "^4.2.11",
         "svelte-check": "^3.6.4",

@@ -1,14 +1,14 @@
 // Imports ====================================================================
 
-import { v1 as uuid } from 'uuid'
-import bcrypt from 'bcrypt'
-import url from 'url'
-import path from 'path'
-import fs from 'fs/promises'
-import Logger from '../logging/logging.js'
-import Config from '../config/config.js'
-import AsyncSqlite3 from './sqlite3.js'
-import Sqlite3TxQueue from './sqlite3TxQueue.js'
+import { v1 as uuid }   from 'uuid'
+import bcrypt           from 'bcrypt'
+import url              from 'url'
+import path             from 'path'
+import fs               from 'fs/promises'
+import Logger           from '../logging/logging.js'
+import Config           from '../config/config.js'
+import AsyncSqlite3     from './sqlite3.js'
+import Sqlite3TxQueue   from './sqlite3TxQueue.js'
 
 const out = Logger.getScope(import.meta.url)
 
@@ -18,6 +18,15 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 const sql = (s: TemplateStringsArray) => s[0]
 
 // Types ======================================================================
+
+interface UserAccountData {
+    username:   string
+    uuid:       string
+    password:   string
+    root:       boolean
+    created:    Date
+    lastLogin:  Date | null
+}
 
 // Code =======================================================================
 
@@ -113,11 +122,31 @@ export default new class UserAccounts {
 
             }
 
+            console.log(await this.get('admin'))
+
         } 
         catch (error) {
             return error as Error    
         }
     }
 
+    public async get(name: string): EavAsync<UserAccountData> {
+        try {
+
+            const [userError, user] = await this.db.get<UserAccountData>(sql`
+                SELECT * FROM users WHERE username = $username;
+            `, { $username: name})
+
+            if (userError) return [userError, undefined]
+
+            user.created = new Date(user.created as any as string)
+            user.lastLogin = user.lastLogin === null ? null : new Date(user.lastLogin as any as string)
+            return [undefined, user]            
+
+        } 
+        catch (error) {
+            return [error as Error, undefined]
+        } 
+    }
 
 }

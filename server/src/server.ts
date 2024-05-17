@@ -1,8 +1,8 @@
 // Imports ====================================================================
 
-import HttpServer from "./api/httpServer.js"
-import Config from "./config/config.js"
-import Logger from "./logging/logging.js"
+import HttpServer   from "./api/httpServer.js"
+import Config       from "./config/config.js"
+import Logger       from "./logging/logging.js"
 import userAccounts from "./db/userAccounts.js"
 
 const out = Logger.getScope(import.meta.url)
@@ -31,6 +31,8 @@ export default class Server {
             // HTTP server
             const e4 = await HttpServer.start()
             if (e4) throw e4
+
+            process.env.NODE_ENV === 'production' && out.INFO("Running in production mode.")
 
         } 
         catch (error) {
