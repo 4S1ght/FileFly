@@ -54,7 +54,7 @@ export default new class UserAccounts {
     private async prepare() {
         try {
 
-            out.DEBUG('Preparing database.')
+            out.INFO('Preparing database.')
 
             // Enable foreign key constrains
             out.DEBUG('Prepare > foreign keys')

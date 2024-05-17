@@ -39,14 +39,16 @@ export default class Sqlite3TxQueue {
 
                 for (let i = 0; i < this.queue.length; i++) {
                     const [acquire, time] = this.queue[i]
+                    let tm: NodeJS.Timeout
                     await Promise.any([
                         // Manual resolver
                         new Promise<void>(resume => {
+                            clearTimeout(tm)
                             acquire({ release: resume })
                         }),
                         // Default or specified timeout to prevent deadlocks.
                         new Promise<void>(resume => {
-                            setTimeout(resume, time)
+                            tm = setTimeout(resume, time)
                         })
                     ])
                     out.DEBUG(`[0x${(this.reqs).toString(16)}] release`)
