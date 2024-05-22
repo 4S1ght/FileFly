@@ -43,11 +43,11 @@ export default class HttpServer {
                     const options: https.ServerOptions = { ...sslData }
                     this.server = https.createServer(options, this.app)
 
-                    out.INFO(`Mode: HTTPS`)
+                    out.INFO(`Network protocol: https`)
                 }
                 else {
                     this.server = http.createServer(this.app)
-                    out.WARN(`Mode: HTTP`)
+                    out.WARN(`Network protocol: http`)
                 }
                 
                 this.finishAPISetup()
@@ -59,7 +59,7 @@ export default class HttpServer {
 
             } 
             catch (error) {
-                finish(error as Error)    
+                finish(error as Error)
             }
         })
     }

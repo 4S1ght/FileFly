@@ -30,12 +30,12 @@ interface UserAccountData {
 
 // Code =======================================================================
 
-export default new class UserAccounts {
+export default class UserAccounts {
 
-    private txq = new Sqlite3TxQueue()
-    private declare db: AsyncSqlite3
+    private static declare txq: Sqlite3TxQueue
+    private static declare db: AsyncSqlite3
 
-    public async open(): EavSingleAsync {
+    public static async open(): EavSingleAsync {
         try {
             
             out.INFO('Opening database.')
@@ -48,6 +48,7 @@ export default new class UserAccounts {
             const [dbError, dbInstance] = await AsyncSqlite3.open(filename)
             if (dbError) return dbError
             this.db = dbInstance
+            this.txq = new Sqlite3TxQueue()
 
             const prepareError = await this.prepare()
             if (prepareError) return prepareError
@@ -60,7 +61,7 @@ export default new class UserAccounts {
         } 
     }
 
-    private async prepare() {
+    private static async prepare() {
         try {
 
             out.INFO('Preparing database.')
@@ -122,15 +123,17 @@ export default new class UserAccounts {
 
             }
 
-            console.log(await this.get('admin'))
-
         } 
         catch (error) {
             return error as Error    
         }
     }
 
-    public async get(name: string): EavAsync<UserAccountData> {
+    /**
+     * Returns the user account object of a specified `name`.
+     * @returns `[error?, user?]`
+     */
+    public static async get(name: string): EavAsync<UserAccountData> {
         try {
 
             const [userError, user] = await this.db.get<UserAccountData>(sql`

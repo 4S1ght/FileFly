@@ -74,8 +74,8 @@ export default new class Logger {
                         level: Config.$.log_console_level
                     }),
                     new winston.transports.DailyRotateFile({
-                        filename:       path.join(__dirname, "../../../logs/%DATE%.log"),
-                        auditFile:      path.join(__dirname, "../../../logs/audit.json"),
+                        filename:       path.join(__dirname, "../../logs/%DATE%.log"),
+                        auditFile:      path.join(__dirname, "../../logs/audit.json"),
                         datePattern:    'YYYY-MM-DD',
                         format:         this.formats.file,
                         level:          Config.$.log_file_level,
