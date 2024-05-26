@@ -18,7 +18,7 @@
     /** Displays what item is currently being loaded.*/
     let _loadItem = "Filefly Player"
     /** Displays login and loading issues. */
-    let _loadIssue = "Wrong username or password. Or maybe something else, not sure. Get a life, may do some good for you... Or don't. If you like..."
+    let _loadIssue = "Wrong username or password."
 
     // Code ===================================================================
 
@@ -62,6 +62,7 @@
                 <button type="submit">Login</button>
             </div>
             <p class="login-feedback">
+                <i class="fa-solid fa-triangle-exclamation icon"/>
                 {_loadIssue}
             </p>
         </div>
@@ -179,9 +180,17 @@
                 border: solid 1px var(--l1-outline);
                 border-radius: 10px;
                 padding: 1rem 1.5rem;
-                span {
-                    color: red;
-                    font-size: 20px;
+                position: relative;
+
+                .icon {
+                    color: var(--l1-text-light);
+                    position: absolute;
+                    bottom: -1.2rem;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    font-size: 1.2rem;
+                    background-color: var(--l1-bg);
+                    padding: 0.5rem;
                 }
             }
 
