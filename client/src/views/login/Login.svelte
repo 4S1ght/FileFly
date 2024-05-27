@@ -18,7 +18,9 @@
     /** Displays what item is currently being loaded.*/
     let _loadItem = "Filefly Player"
     /** Displays login and loading issues. */
-    let _loadIssue = "Wrong username or password."
+    let _loadIssue = "Wrong username or password"
+    /** Displays a counter to signify that an issue has happened more than once. */
+    let _loadIssueCount = 3
 
     // Code ===================================================================
 
@@ -61,10 +63,14 @@
                 </div>
                 <button type="submit">Login</button>
             </div>
-            <p class="login-feedback">
-                <i class="fa-solid fa-triangle-exclamation icon"/>
-                {_loadIssue}
-            </p>
+            {#if _loadIssue}
+                <p class="login-feedback">
+                    <i class="fa-solid fa-triangle-exclamation icon"/>
+                    {_loadIssue} {_loadIssueCount ? `(x${_loadIssueCount})` : ''}
+                </p>
+            {:else}
+                <p class="login-feedback-placeholder"></p>
+            {/if}
         </div>
 
     </form>
@@ -174,6 +180,10 @@
                 }
             }
 
+            .login-feedback-placeholder {
+                margin-top: 2rem;
+                padding: 1rem 1.5rem;
+            }
             .login-feedback {
                 text-align: center;
                 margin-top: 2rem;
@@ -183,14 +193,14 @@
                 position: relative;
 
                 .icon {
-                    color: var(--l1-text-light);
+                    color: var(--l1-outline);
                     position: absolute;
                     bottom: -1.2rem;
                     left: 50%;
                     transform: translateX(-50%);
                     font-size: 1.2rem;
                     background-color: var(--l1-bg);
-                    padding: 0.5rem;
+                    padding: 0.6rem 0.2rem;
                 }
             }
 
