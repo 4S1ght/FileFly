@@ -3,7 +3,8 @@
 import HttpServer   from "./api/httpServer.js"
 import Config       from "./config/config.js"
 import Logger       from "./logging/logging.js"
-import userAccounts from "./db/userAccounts.js"
+import userAccounts from "./db/userAccount.js"
+import Util from "./lib/utils.js"
 
 const out = Logger.getScope(import.meta.url)
 
@@ -36,10 +37,8 @@ export default class Server {
 
         } 
         catch (error) {
-            // Use setImmediate to throw the main error even if out.CRIT fails
-            // due to strange config issues or other edge-cases
-            setImmediate(() => { throw error })
-            out.CRIT(error as Error)
+            Util.silence(() => out.CRIT(error as Error))
+            throw error
         }
     }
 
