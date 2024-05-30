@@ -43,6 +43,17 @@ const ZConfig = object({
     ssl_locality_name: string(),
     ssl_organization_name: string(),
     bcrypt_password_salt_rounds: number(),
+    // Accounts
+    username_min_length: number(),
+    username_max_length: number(),
+    password_min_length: number(),
+    password_use_numbers: boolean(),
+    password_use_big_little_symbols: boolean(),
+    password_use_special_chars: boolean(),
+    // Sessions
+    session_duration_short: number(),
+    session_duration_long: number(),
+    session_duration_elevated: number(),
     // Logging
     log_console_level: ZLogLevel,
     log_file_level: ZLogLevel,
