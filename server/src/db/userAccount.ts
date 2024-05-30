@@ -4,7 +4,7 @@ import bcrypt                                        from 'bcrypt'
 import url                                           from 'node:url'
 import path                                          from 'node:path'
 import crypto                                        from 'node:crypto'
-import z, { object, string, boolean }                from 'zod'
+import z, { object, string, boolean, number }        from 'zod'
 import { Level, DatabaseOptions }                    from 'level'
 import { AbstractSublevel, AbstractSublevelOptions } from 'level/node_modules/abstract-level'
 import Logger                                        from '../logging/logging.js'
@@ -16,6 +16,8 @@ const __filename = url.fileURLToPath(import.meta.url)
 const __dirname  = url.fileURLToPath(new URL('.', import.meta.url))
 
 // Types ======================================================================
+
+const ZString = string()
 
 /**
  * Stores all the account-specific data, including the username.
@@ -115,7 +117,7 @@ export default class UserAccount {
     public static async create(user: z.infer<typeof this.TCreateParams>, skipChecks = false) {
         try {
             
-            out.NOTICE(`CREATE call made | user:${user.name}, root:${user.root}`)
+            out.NOTICE(`CREATE user:${user.name}, root:${user.root}`)
 
             // Check if name is taken
             if (await this.exists(user.name)) return 'ERR_NAME_TAKEN'
@@ -134,7 +136,7 @@ export default class UserAccount {
             
             const pwdHash = await bcrypt.hash(user.pass, Config.$.bcrypt_password_salt_rounds)
             const created = new Date().toISOString()
-            const [idError, userID]  = await this._generateUserID(user.name)
+            const [idError, userID] = await this._generateUserID(user.name)
             if (idError) return idError
 
             await this.slAccounts.put(user.name, {
@@ -164,7 +166,8 @@ export default class UserAccount {
     public static async delete(name: string) {
         try {
 
-            out.NOTICE(`DELETE call made | user:${name}`)
+            ZString.parse(name)
+            out.NOTICE(`DELETE ${name.toString()}`)
 
             // Check if user exists
             if (await this.exists(name) === false) return 'ERR_USER_NOT_FOUND'
@@ -176,7 +179,7 @@ export default class UserAccount {
             if (admins.length === 1) return 'ERR_CANT_DEL_LAST_ADMIN'
 
             await this.slAccounts.del(name)
-            out.NOTICE(`DELETE call successful | user:${name}`)
+            out.NOTICE(`DELETE call successful | user:${name.toString()}`)
             
         }
         catch (error) {
@@ -184,6 +187,25 @@ export default class UserAccount {
             return error as Error
         }
     }
+
+    /**
+     * Returns user account information, like the password hash, root privileges and a static user ID.
+     * @param name Account username
+     * @returns Account data
+     */
+    public static async get(name: string): Promise<UserAccountData | undefined> {
+        try {
+            ZString.parse(name)
+            out.DEBUG(`GET "${name.toString()}"`)
+            const user = await this.slAccounts.get(name) as UserAccountData
+            user.username = name
+            return user
+        } 
+        catch { 
+            return undefined 
+        }
+    }
+
     /**
      * Returns a list of all existing user accounts.
      * @returns Account entries array
@@ -211,33 +233,48 @@ export default class UserAccount {
         return this.slAccounts.keys().all()
     }
 
-
-    /**
-     * Returns user account information, like the password hash, root privileges and a static user ID.
-     * @param name Account username
-     * @returns Account data
-     */
-    public static async get(name: string): Promise<UserAccountData | undefined> {
-        try { 
-            const user = await this.slAccounts.get(name) as UserAccountData
-            user.username = name
-            return user
-        } 
-        catch { 
-            return undefined 
-        }
-    }
-
     /**
      * Returns a `boolean` indicating whether the user of a given name exists.
      */
-    public static async exists(name: string){
+    public static async exists(name: string) {
         try {
+            ZString.parse(name)
             await this.slAccounts.get(name)
             return true  
         } 
         catch (error) {
             return false
+        }
+    }
+
+    // Preferences ============================================================
+
+    private static TPreferenceValue = z.nullable(z.union([
+        string(), number(), boolean(), z.undefined()
+    ]))
+
+    public static async setPreference(userID: string, preference: string, value: any): EavSingleAsync {
+        try {
+
+            ZString.parse(preference)
+            this.TPreferenceValue.parse(value)
+            
+            const preferencesObject = await new Promise<UserPreferences>(finish => {
+                this.slPreferences.get(userID, (err, doc) => {
+                    if (err) finish({})
+                    else finish(doc || {})
+                })
+            })
+
+            if (value === undefined) delete preferencesObject[preference]
+            else preferencesObject[preference] = value
+
+            await this.slPreferences.put(userID, preferencesObject)
+            out.DEBUG(`Preference set "${preference}" for ${userID}`)
+
+        } 
+        catch (error) {
+            return error as Error
         }
     }
 
