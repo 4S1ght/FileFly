@@ -117,7 +117,7 @@ export default class UserAccount {
     public static async create(user: z.infer<typeof this.TCreateParams>, skipChecks = false) {
         try {
             
-            out.NOTICE(`CREATE user:${user.name}, root:${user.root}`)
+            out.NOTICE(`UserAccount.create user:${user.name}, root:${user.root}`)
 
             // Check if name is taken
             if (await this.exists(user.name)) return 'ERR_NAME_TAKEN'
@@ -147,11 +147,11 @@ export default class UserAccount {
                 lastLoginISO: null
             })
 
-            out.NOTICE(`CREATE call succeeded | user:${user.name}, root:${user.root}, uuid:${userID}`)
+            out.NOTICE(`UserAccount.create successful | user:${user.name}, root:${user.root}, uuid:${userID}`)
 
         } 
         catch (error) {
-            out.ERROR(`CREATE error:`, error as Error)
+            out.ERROR(`UserAccount.create error:`, error as Error)
             return error as Error
         }
     }
@@ -167,7 +167,7 @@ export default class UserAccount {
         try {
 
             ZString.parse(name)
-            out.NOTICE(`DELETE ${name.toString()}`)
+            out.NOTICE(`UserAccount.delete > "${name.toString()}"`)
 
             // Check if user exists
             if (await this.exists(name) === false) return 'ERR_USER_NOT_FOUND'
@@ -179,7 +179,7 @@ export default class UserAccount {
             if (admins.length === 1) return 'ERR_CANT_DEL_LAST_ADMIN'
 
             await this.slAccounts.del(name)
-            out.NOTICE(`DELETE call successful | user:${name.toString()}`)
+            out.NOTICE(`UserAccount.delete > successful | user:"${name.toString()}"`)
             
         }
         catch (error) {
@@ -196,7 +196,7 @@ export default class UserAccount {
     public static async get(name: string): Promise<UserAccountData | undefined> {
         try {
             ZString.parse(name)
-            out.DEBUG(`GET "${name.toString()}"`)
+            out.DEBUG(`UserAccount.get > "${name.toString()}"`)
             const user = await this.slAccounts.get(name) as UserAccountData
             user.username = name
             return user
@@ -243,54 +243,92 @@ export default class UserAccount {
             return true  
         } 
         catch (error) {
-            return false
+            return (error as any as LevelGetError).code === 'LEVEL_NOT_FOUND'
         }
     }
 
     // Preferences ============================================================
 
-    private static TPreferenceValue = z.nullable(z.union([
+    /** Caches user preferences documents until they're written to. */
+    private static prefCache = new Map<string, UserPreferences>()
+
+    /** Type safety guard for the preference properties. */
+    public static TPreferenceValue = z.nullable(z.union([
         string(), number(), boolean(), z.undefined()
     ]))
 
-    public static async setPreference(userID: string, preference: string, value: any): EavSingleAsync {
+    /**
+     * Sets a preference entry in the user preferences object, saves it to the database and caches it in memory
+     * to speed up further reads. 
+     * @param userID Static user account ID
+     * @param key The name of the preference. Eg. "prefer_dark_theme"
+     * @param value The value of the preference. Eg. "true"
+     */
+    public static async setPreferenceEntry(userID: string, key: string, value: UserPreferences[string]): EavSingleAsync<Error | LevelGetError | z.ZodError> {
         try {
 
-            ZString.parse(preference)
             this.TPreferenceValue.parse(value)
+            out.DEBUG(`UserAccount.setPreferenceEntry > "${key}" for ${userID}`);
             
-            const preferencesObject = await new Promise<UserPreferences>(finish => {
-                this.slPreferences.get(userID, (err, doc) => {
-                    if (err) finish({})
-                    else finish(doc || {})
-                })
-            })
+            const [prefError, preferences] = await this.getPreferences(userID, key)
+            if (prefError) return prefError
 
-            if (value === undefined) delete preferencesObject[preference]
-            else preferencesObject[preference] = value
+            if (value === undefined) delete preferences[key]
+            else preferences[key] = value
 
-            await this.slPreferences.put(userID, preferencesObject)
-            out.DEBUG(`Preference set "${preference}" for ${userID}`)
+            this.prefCache.set(userID, preferences)
+            await this.slPreferences.put(userID, preferences)
+            out.DEBUG(`UserAccount.setPreferenceEntry > success | set "${key}" for ${userID}`)
 
         } 
-        catch (error) {
-            return error as Error
+        catch (error) { 
+            return error as Error | LevelGetError
         }
     }
 
+    /**
+     * Retrieves the preferences object for a given user and caches it into memory.
+     * An empty object is returned if user has no set preferences.
+     * @param userID Static user account ID
+     * @param key user preferences setting (or "key")
+     */
+    public static async getPreferences(userID: string, key: string): EavAsync<UserPreferences> {
+        return new Promise((resolve) => {
+
+            out.DEBUG(`UserAccount.getPreferenceEntry > "${key}" for "${userID}"`)
+
+            const preferences = this.prefCache.get(userID)
+            if (preferences) return resolve([null, preferences])
+
+            this.slPreferences.get(userID, (error, doc) => {
+                if (error) {
+                    if ((error as any as LevelGetError).notFound) {
+                        this.prefCache.set(userID, {})
+                        resolve([null, {}])
+                    }
+                    else resolve([error, null])
+                }
+                else {
+                    this.prefCache.set(userID, doc!)
+                    resolve([null, doc!])
+                }
+            })
+            
+        })
+    }
+
     // Utility methods ========================================================
-
-
+    
     private static async _generateUserID(username: string): EavAsync<string> {
         try {
             const id = crypto.createHash('sha256').update(username).digest().toString('base64url')
             const [usersError, users] = await this.listAccountEntries()
-            if (usersError) return [usersError, undefined]
+            if (usersError) return [usersError, null]
             if (users.find(x => x.userID === id)) return await this._generateUserID(username)
-            return [undefined, id]
+            return [null, id]
         } 
         catch (error) {
-            return [error as Error, undefined]
+            return [error as Error, null]
         }
     }
 

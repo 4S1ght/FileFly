@@ -7,12 +7,12 @@
     "author": "4Sight",
     "license": "MIT",
     "scripts": {
-        "dev": "npm run dev --prefix ./client",
-        "build": "npm run build --prefix ./client",
-        "preview": "npm run preview --prefix ./client",
-        "check": "npm run check --prefix ./client",
-        "sdev": "tsc --watch --project ./server/",
-        "debug": "nodemon --enable-source-maps ./build/server/server.js"
+        "dev:c": "npm run dev --prefix ./client",
+        "build:c": "npm run build --prefix ./client",
+        "preview:c": "npm run preview --prefix ./client",
+        "check:c": "npm run check --prefix ./client",
+        "dev:s": "tsc --watch --project ./server/",
+        "watch:s": "nodemon --enable-source-maps ./build/server/server.js"
     },
     "devDependencies": {
         "@sveltejs/vite-plugin-svelte": "^3.0.2",

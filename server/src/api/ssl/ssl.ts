@@ -29,8 +29,8 @@ export default new class SSL {
 
     public async init() {
 
-        out.DEBUG(`SSL init`)
-        out.DEBUG(`SSL dir: ${this.sslFolder}`)
+        out.DEBUG(`SSL.init`)
+        out.DEBUG(`SSL.sslFolder > ${this.sslFolder}`)
 
         this.certRegenInterval = 1 // days
         this.certRegenThreshold = 10 // days
@@ -43,7 +43,7 @@ export default new class SSL {
             if (await this.shouldRegenerateCert()) {
                 const timestamp = await this.getTimestamp()
                 out.DEBUG(
-                    `Cert.init > timestamp valid until ${c.blue(timestamp ? new Date(timestamp) : "N/A")} ` +
+                    `SSL.init > timestamp valid until ${c.blue(timestamp ? new Date(timestamp) : "N/A")} ` +
                     `(${timestamp ? ('~'+((timestamp - Date.now()) / 86400000).toFixed(0)) : 0} days)`
                 )
                 await this.generateSSLCert()
@@ -71,24 +71,24 @@ export default new class SSL {
                 organizationName: Config.$.ssl_organization_name
             }
 
-            out.WARN('Cert.generateSSLCert getting new ssl cert/key pair')
-            out.DEBUG(`Cert.generateSSLCert config`, JSON.stringify(config))
+            out.WARN('SSL.generateSSLCert > getting new ssl cert/key pair')
+            out.DEBUG(`SSL.generateSSLCert > config`, JSON.stringify(config))
 
             const ssl = await generateX509Cert(config)
 
-            out.DEBUG(`Cert.generateSSLCert writing SSL cert - ${c.blue(this.certPem)}`)
+            out.DEBUG(`SSL.generateSSLCert > writing SSL cert - ${c.blue(this.certPem)}`)
             await fs.writeFile(this.certPem, ssl.cert)
 
-            out.DEBUG(`Cert.generateSSLCert writing private key - ${c.blue(this.pratekeyPem)}`)
+            out.DEBUG(`SSL.generateSSLCert > writing private key - ${c.blue(this.pratekeyPem)}`)
             await fs.writeFile(this.pratekeyPem, ssl.privateKey)
             
             // Update .timestamp file
             const validUntil = await this.setTimestamp()
 
-            out.NOTICE('Cert.generateSSLCert finished successfully')
+            out.NOTICE('SSL.generateSSLCert > finished successfully')
             out.NOTICE(
-                `New SSL certificate valid until ${c.blue(new Date(validUntil))}. Alg: ${config.alg}, key size: ${config.keySize}.` +
-                `(${((validUntil - Date.now()) / 86400000).toFixed(0)})`
+                `New SSL certificate valid until ${c.blue(new Date(validUntil))}. Alg: ${config.alg}, key size: ${config.keySize}. ` +
+                `(${((validUntil - Date.now()) / 86400000).toFixed(0)} days)`
             )
             
         } 
@@ -101,21 +101,21 @@ export default new class SSL {
         try {
             if (Config.$.ssl_source_type === 'external') {
                 out.INFO('Using external SSL certificate')
-                return [undefined, {
+                return [null, {
                     cert: await fs.readFile(Config.$.ssl_external_cert!, 'utf-8'),
                     key: await fs.readFile(Config.$.ssl_external_cert!, 'utf-8')
                 }]
             }
             else {
                 out.WARN('Using self-signed SSL certificate')
-                return [undefined, {
+                return [null, {
                     cert: await fs.readFile(this.certPem, 'utf-8'),
                     key: await fs.readFile(this.pratekeyPem, 'utf-8')
                 }]
             }
         } 
         catch (error) {
-            return [error as Error, undefined]
+            return [error as Error, null]
         }
     }
 

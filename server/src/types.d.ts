@@ -39,4 +39,18 @@ declare type EavSingle<E = Error> = E | Nullish
  */
 declare type EavSingleAsync<E = Error> = Promise<E | Nullish>
 
+/**
+ * Stands for either undefined or null.
+ */
 declare type Nullish = undefined | null
+
+// ============================================================================
+// Module/library-specific helper types
+// ============================================================================
+
+/** Describes some levelDB error objects. */
+declare type LevelGetError = {
+    code: string
+    notFound: boolean
+    status: number
+}
