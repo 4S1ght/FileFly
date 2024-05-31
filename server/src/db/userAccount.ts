@@ -238,12 +238,11 @@ export default class UserAccount {
      */
     public static async exists(name: string) {
         try {
-            ZString.parse(name)
             await this.slAccounts.get(name)
             return true  
         } 
         catch (error) {
-            return (error as any as LevelGetError).code === 'LEVEL_NOT_FOUND'
+            return (error as any as LevelGetError).code !== 'LEVEL_NOT_FOUND'
         }
     }
 
