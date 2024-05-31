@@ -36,11 +36,12 @@ export default class RequestLogger {
         const url = req.originalUrl
         const start = Date.now()
         const blankStatus = c.grey('###')
+        const blankTime = c.grey("*****")
         const reqSign = c.grey('req')
         const resSign = c.whiteBright('res')
     
-        out.HTTP(`${id} ${reqSign} ${method} ${blankStatus} ${ip} ${url}`)
-        res.on('finish', () => out.HTTP(`${id} ${resSign} ${method} ${this.getStatusCodeColor(res.statusCode)} ${ip} ${c.whiteBright(Date.now()-start+'ms')} ${url}`))
+        out.HTTP(`${id} ${reqSign} ${method} ${blankStatus} ${ip} ${blankTime} ${url}`)
+        res.on('finish', () => out.HTTP(`${id} ${resSign} ${method} ${this.getStatusCodeColor(res.statusCode)} ${ip} ${c.whiteBright(Date.now()-start+'ms').padEnd(5)} ${url}`))
     
         next()
     
