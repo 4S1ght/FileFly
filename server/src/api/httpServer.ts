@@ -22,6 +22,11 @@ const __dirname  = url.fileURLToPath(new URL('.', import.meta.url))
 export type TMiddleware     = (req: express.Request, res: express.Response, next: express.NextFunction) => any
 export type TRequestHandler = (req: express.Request, res: express.Response) => any
 
+// Endpoints ==================================================================
+
+// ==== POST HANDLERS ====
+import newSession from './_post/newSession.js'
+
 // Code =======================================================================
 
 export default class HttpServer {
@@ -72,6 +77,13 @@ export default class HttpServer {
         this.app.use(bodyParser.json())
         this.app.use(cookieParser())
         this.app.use(requestLogger.logger)
+
+        const router = express.Router({ mergeParams: false })
+
+        router.post('/session/new', newSession)
+
+        this.app.use('/api/v1', router)
+
 
     }
 
