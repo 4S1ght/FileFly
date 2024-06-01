@@ -17,7 +17,7 @@ const __dirname  = url.fileURLToPath(new URL('.', import.meta.url))
 export interface UserSessionEntry {
     /** Account username */
     username: string
-    /** Unique, non-changing UUID assigned to the account owner. */
+    /** Unique, non-changing SHA256 ID assigned to the account owner. */
     userID: string
     /** Specifies whether the session belongs to a root user. */
     root: boolean
@@ -82,8 +82,8 @@ export default class UserSession {
 
             const [SIDError, SID] = await this._getUniqueSID()
             if (SIDError) {
-                out.ERROR('SessionStore.create > SID_GEN_ERROR:', SIDError)
-                return [SIDError, undefined]
+                out.ERROR('UserSession.create > SID_GEN_ERROR:', SIDError)
+                return ['SID_GEN_ERROR', undefined]
             }
             
             const created = new Date().toISOString()
@@ -97,7 +97,7 @@ export default class UserSession {
             }
 
             this.sessionCache.set(SID, session)
-            out.NOTICE(`SessionStore.create > Successful | name:${name} long:${long} uuid:${session.userID}`)
+            out.NOTICE(`UserSession.create > Successful | name:${name} long:${long} userID:${session.userID}`)
             return [undefined, SID]
 
         } 
@@ -116,7 +116,7 @@ export default class UserSession {
     public static async elevate(sid: string, pass: string) {
         try {
 
-            out.NOTICE(`SessionStore.elevate() call made | SID:${sid.slice(0, 10)}...${sid.slice(-10)}`)
+            out.NOTICE(`UserSession.elevate() call made | SID:${sid.slice(0, 10)}...${sid.slice(-10)}`)
             
             const session = this.sessionCache.get(sid)
             if (!session) return 'ERR_UNKNOWN_SESSION'
@@ -129,7 +129,7 @@ export default class UserSession {
             const doPasswordsMatch = await bcrypt.compare(pass, account.password)
             if (!doPasswordsMatch) return "ERR_BAD_PASS"
 
-            out.NOTICE(`SessionStore.elevate() call successful | SID:${sid.slice(0, 10)}...${sid.slice(-10)} user:${account.username}`)
+            out.NOTICE(`UserSession.elevate() call successful | SID:${sid.slice(0, 10)}...${sid.slice(-10)} user:${account.username}`)
             session.type = 'elevated'
 
         } 

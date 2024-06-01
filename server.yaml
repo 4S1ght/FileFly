@@ -8,9 +8,9 @@
 # Defines whether to use HTTPS (encrypted) or HTTP (unencrypted) connections.
 # Turning this setting off may expose the server's user information, passwords,
 # session IDs and other sensitive information. 
-use_https: true
+use_https: false
 
-http_port: 443
+http_port: 80
 
 # Specifies where to source the SSL certificate from.
 # Available options are:

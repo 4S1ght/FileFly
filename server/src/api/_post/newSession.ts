@@ -27,7 +27,11 @@ export type HTTPLoginBody = z.infer<typeof ZRequestBody>
 const POSTLogin: TRequestHandler = async function(req, res) {
     try {
 
-        if (ZRequestBody.safeParse(req.body).success === false) return res.status(400).end()
+        const parseStatus = ZRequestBody.safeParse(req.body)
+        if (parseStatus.success === false) {
+            out.DEBUG(`Bad request body:`, parseStatus)
+            return res.status(400).end()
+        }
         const { user, pass, long } = req.body as HTTPLoginBody
 
         const [createError, SID] = await UserSession.create(user, pass, long)
