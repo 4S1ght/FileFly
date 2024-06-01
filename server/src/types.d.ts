@@ -1,6 +1,6 @@
 /**
  * Error-as-value return type.  
- * Used together with array destructuring to produce a Go-like return returns.
+ * Used together with array destructuring to produce a Go-like error returns.
  * ```typescript
  * // Example:
  * const [error, value] = someMethod()
@@ -9,6 +9,7 @@
  * // "value" won't be defined unless error is checked against and handled.
  * value.doSomething() 
  * ```
+ * Note: This helper type only works with **constants**. Avoid "let" and "var".
  */
 declare type Eav<V, E = Error> = [E, Nullish] | [Nullish, V]
 
@@ -23,6 +24,7 @@ declare type Eav<V, E = Error> = [E, Nullish] | [Nullish, V]
  * // "value" won't be defined unless error is checked against and handled.
  * value.doSomething() 
  * ```
+ * Note: This helper type only works with **constants**. Avoid "let" and "var".
  */
 declare type EavAsync<V, E = Error> = Promise<[E, Nullish] | [Nullish, V]>
 
@@ -30,7 +32,6 @@ declare type EavAsync<V, E = Error> = Promise<[E, Nullish] | [Nullish, V]>
  * An error-as-value return type for functions that don't have to
  * return any information and would benefit being error-safe.
  */
-
 declare type EavSingle<E = Error> = E | Nullish
 
 /**

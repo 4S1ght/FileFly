@@ -73,16 +73,15 @@ export default class HttpServer {
 
         // Only run static server in deployment, in development, Svelte dev server proxy is used for the API access
         process.env.NODE_ENV === 'production' && this.app.use(express.static(this.clientApp))
-        
+        const router = express.Router({ mergeParams: false })
+
         this.app.use(bodyParser.json())
         this.app.use(cookieParser())
         this.app.use(requestLogger.logger)
-
-        const router = express.Router({ mergeParams: false })
+        this.app.use('/api/v1', router)
 
         router.post('/session/new', newSession)
 
-        this.app.use('/api/v1', router)
 
 
     }
