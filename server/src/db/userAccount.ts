@@ -195,7 +195,6 @@ export default class UserAccount {
      */
     public static async get(name: string): Promise<TUserAccountData | undefined> {
         try {
-            ZString.parse(name)
             out.DEBUG(`UserAccount.get > "${name.toString()}"`)
             const user = await this.slAccounts.get(name) as TUserAccountData
             user.username = name
@@ -203,6 +202,23 @@ export default class UserAccount {
         } 
         catch { 
             return undefined 
+        }
+    }
+
+    /**
+     * Returns user account information, selected by user's static ID.
+     * @param userID User account ID.
+     * @returns Account data
+     */
+    public static async getByID(userID: string): Promise<TUserAccountData | undefined> {
+        try {
+            out.DEBUG(`UserAccount.getByID > "${userID.toString()}"`)
+            const [error, users] = await this.listAccountEntries()
+            if (error) return undefined
+            return users.find(user => user.userID === userID)
+        } 
+        catch (error) {
+            return undefined
         }
     }
 
@@ -292,12 +308,17 @@ export default class UserAccount {
      * @param key user preferences setting (or "key")
      */
     public static async getPreferences(userID: string): EavAsync<TUserPreferences> {
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
 
             out.DEBUG(`UserAccount.getPreferences > userID:${userID}`)
 
+            // Check cached data first
             const preferences = this.prefCache.get(userID)
             if (preferences) return resolve([null, preferences])
+
+            // Validate if the user actually exists to prevent stale entries
+            if (await this.getByID(userID) === undefined)
+                return resolve([new Error(`Can't read preferences of unknown user.`), null])
 
             this.slPreferences.get(userID, (error, doc) => {
                 if (error) {
