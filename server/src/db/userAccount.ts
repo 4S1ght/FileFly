@@ -23,7 +23,7 @@ const ZString = string()
  * Stores all the account-specific data, including the username.
  * (Does not store user preferences, which live under a sublevel)
  */
-interface UserAccountData {
+interface TUserAccountData {
     username:       string
     userID:         string
     password:       string
@@ -33,11 +33,11 @@ interface UserAccountData {
 }
 
 /** Used internally in the database. "username" is added when needed. */
-type UserAccountEntry = Omit<UserAccountData, 'username'>
+type TUserAccountEntry = Omit<TUserAccountData, 'username'>
 
 /** Stores all user preferences used by the UI apps and plugins. */
-interface UserPreferences {
-    [userID: string]: string | number | Nullish
+export interface TUserPreferences {
+    [preference: string]: string | number | boolean | Nullish
 }
 
 // Code =======================================================================
@@ -47,8 +47,8 @@ export default class UserAccount {
     private static dirname = path.join(__dirname, '../../db/')
 
     private static declare db:            Level<string, never>
-    private static declare slAccounts:    AbstractSublevel<typeof this.db, string | Buffer | Uint8Array, string, /* type */ UserAccountEntry>
-    private static declare slPreferences: AbstractSublevel<typeof this.db, string | Buffer | Uint8Array, string, /* type */ UserPreferences>
+    private static declare slAccounts:    AbstractSublevel<typeof this.db, string | Buffer | Uint8Array, string, /* type */ TUserAccountEntry>
+    private static declare slPreferences: AbstractSublevel<typeof this.db, string | Buffer | Uint8Array, string, /* type */ TUserPreferences>
 
     public static async open(): EavSingleAsync {
         try {
@@ -66,8 +66,8 @@ export default class UserAccount {
             
             // Instantiate the database models
             this.db            = new Level(this.dirname, dbOptions)
-            this.slAccounts    = this.db.sublevel<string, UserAccountEntry>('account', slOptions)
-            this.slPreferences = this.db.sublevel<string, UserPreferences>('pref', slOptions)
+            this.slAccounts    = this.db.sublevel<string, TUserAccountEntry>('account', slOptions)
+            this.slPreferences = this.db.sublevel<string, TUserPreferences>('pref', slOptions)
 
             // Wait till the DB is open and prevent server startup if it's misbehaving.
             await new Promise<void>((rs, rj) => this.db.defer(() => {
@@ -193,11 +193,11 @@ export default class UserAccount {
      * @param name Account username
      * @returns Account data
      */
-    public static async get(name: string): Promise<UserAccountData | undefined> {
+    public static async get(name: string): Promise<TUserAccountData | undefined> {
         try {
             ZString.parse(name)
             out.DEBUG(`UserAccount.get > "${name.toString()}"`)
-            const user = await this.slAccounts.get(name) as UserAccountData
+            const user = await this.slAccounts.get(name) as TUserAccountData
             user.username = name
             return user
         } 
@@ -210,11 +210,11 @@ export default class UserAccount {
      * Returns a list of all existing user accounts.
      * @returns Account entries array
      */
-    public static async listAccountEntries(): EavAsync<UserAccountData[]> {
+    public static async listAccountEntries(): EavAsync<TUserAccountData[]> {
         try {
-            const users: UserAccountData[] = []
+            const users: TUserAccountData[] = []
             for await (const name of this.slAccounts.keys()) {
-                const user = await this.slAccounts.get(name) as UserAccountData
+                const user = await this.slAccounts.get(name) as TUserAccountData
                 user.username = name
                 users.push(user)
             }
@@ -249,7 +249,7 @@ export default class UserAccount {
     // Preferences ============================================================
 
     /** Caches user preferences documents until they're written to. */
-    private static prefCache = new Map<string, UserPreferences>()
+    private static prefCache = new Map<string, TUserPreferences>()
 
     /** Type safety guard for the preference properties. */
     public static TPreferenceValue = z.nullable(z.union([
@@ -263,13 +263,13 @@ export default class UserAccount {
      * @param key The name of the preference. Eg. "prefer_dark_theme"
      * @param value The value of the preference. Eg. "true"
      */
-    public static async setPreferenceEntry(userID: string, key: string, value: UserPreferences[string]): EavSingleAsync<Error | LevelGetError | z.ZodError> {
+    public static async setPreferenceEntry(userID: string, key: string, value: TUserPreferences[string]): EavSingleAsync<Error | LevelGetError | z.ZodError> {
         try {
 
             this.TPreferenceValue.parse(value)
             out.DEBUG(`UserAccount.setPreferenceEntry > "${key}" for ${userID}`);
             
-            const [prefError, preferences] = await this.getPreferences(userID, key)
+            const [prefError, preferences] = await this.getPreferences(userID)
             if (prefError) return prefError
 
             if (value === undefined) delete preferences[key]
@@ -291,10 +291,10 @@ export default class UserAccount {
      * @param userID Static user account ID
      * @param key user preferences setting (or "key")
      */
-    public static async getPreferences(userID: string, key: string): EavAsync<UserPreferences> {
+    public static async getPreferences(userID: string): EavAsync<TUserPreferences> {
         return new Promise((resolve) => {
 
-            out.DEBUG(`UserAccount.getPreferenceEntry > "${key}" for "${userID}"`)
+            out.DEBUG(`UserAccount.getPreferences > userID:${userID}`)
 
             const preferences = this.prefCache.get(userID)
             if (preferences) return resolve([null, preferences])
@@ -302,12 +302,14 @@ export default class UserAccount {
             this.slPreferences.get(userID, (error, doc) => {
                 if (error) {
                     if ((error as any as LevelGetError).notFound) {
+                        out.DEBUG(`UserAccount.getPreferences > success | userID:${userID} (defaulted due to "LEVEL_NOT_FOUND")`)
                         this.prefCache.set(userID, {})
                         resolve([null, {}])
                     }
                     else resolve([error, null])
                 }
                 else {
+                    out.DEBUG(`UserAccount.getPreferences > success | userID:${userID}`)
                     this.prefCache.set(userID, doc!)
                     resolve([null, doc!])
                 }
