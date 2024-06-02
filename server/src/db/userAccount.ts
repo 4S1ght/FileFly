@@ -322,7 +322,8 @@ export default class UserAccount {
     
     private static async _generateUserID(username: string): EavAsync<string> {
         try {
-            const id = crypto.createHash('sha256').update(username).digest().toString('base64url')
+            // Use name sha-256 hash with a timestamp to prevent collisions
+            const id = crypto.createHash('sha256').update(username).digest().toString('base64url') + '.' + Date.now()
             const [usersError, users] = await this.listAccountEntries()
             if (usersError) return [usersError, null]
             if (users.find(x => x.userID === id)) return await this._generateUserID(username)
