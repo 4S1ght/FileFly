@@ -6,14 +6,18 @@ type ErrorMetadata = { [value: string]: any }
 
 // Code =======================================================================
 
-export default class FFClientError<ErrorMeta extends ErrorMetadata = ErrorMetadata> extends Error {
+export default class FFClientError<
+    ErrorMeta extends ErrorMetadata = ErrorMetadata,
+    ErrorCode extends string = string
+> 
+extends Error {
 
-    public code: string
+    public code: ErrorCode
     public message: string
     public trace: (Error | FFClientError)[] = []
     public meta: ErrorMeta
 
-    constructor(code: string, message: string, cause?: Error | null, meta?: ErrorMeta) {
+    constructor(code: ErrorCode, message: string, cause?: Error | null, meta?: ErrorMeta) {
         super(message)
         Error.captureStackTrace && Error.captureStackTrace(this, this.constructor)
         this.code = code

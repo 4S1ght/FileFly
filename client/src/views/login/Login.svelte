@@ -5,7 +5,7 @@
     import Input from "./Input.svelte"
     import Checkbox from "../../components/Checkbox.svelte"
     import { onMount } from "svelte"
-    import UserAccountClient from "../../core/UserAccountClient"
+    import uapi from "../../core/UserAPI"
 
     // State ==================================================================
 
@@ -47,7 +47,7 @@
     async function submit(e: SubmitEvent | CustomEvent) {
 
         if (e.preventDefault) e.preventDefault()
-        const error = await UserAccountClient.login(_username, _password, _useLongSession)
+        const error = await uapi.login(_username, _password, _useLongSession)
             
         if (error) {
             if (error.code === 'UA_LOGIN_UNKNOWN_ERR') return setIssue('An unknown client error had ocurred.')

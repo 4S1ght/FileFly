@@ -6,7 +6,7 @@ import FFClientError from "./lib/FileflyClientError"
 
 // Code =======================================================================
 
-export default new class UserAccountClient {
+export default new class UserAPI {
 
     /**
      * Sends a login request to the server and returns the possible errors.
@@ -15,7 +15,7 @@ export default new class UserAccountClient {
      * @param long boolean - Whether to use a long session.
      * @returns Possible `Error` object or HTTP status code in case of an error response.
      */
-    public async login(user: string, pass: string, long = false): EavSingleAsync<FFClientError<{ statusCode: number }>> {
+    public async login(user: string, pass: string, long = false): EavSingleAsync<FFClientError<{ statusCode: number }, 'UA_LOGIN_AUTH_ERROR' | 'UA_LOGIN_UNKNOWN_ERR'>> {
         try {
             const res = await fetch('/api/v1/session/new', {
                 method: 'post',
