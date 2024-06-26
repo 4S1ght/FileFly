@@ -10,7 +10,7 @@
     export let placeholder: string = ""
     export let type: HTMLInputTypeAttribute
     export let input: HTMLInputElement
-    export let value: string
+    export let value: string = ""
 
     // State ==================================================================
 
@@ -62,25 +62,25 @@
 <style lang="scss">
 
     .input-field {
-        border: solid 1px var(--l1-outline);
         border-radius: 10px;
         position: relative;
         padding: 1.6rem 1.2rem;
         cursor: text;
         margin-bottom: 1rem;
+        background-color: var(--l1-bg);
 
         .placeholder {
             position: absolute;
             top: 50%;
-            transform: translateY(-50%);
+            color: var(--l1-fg-dim);
             margin: 0;
+            transform: translateY(-50%);
+            transition: transform 0.15s;
             pointer-events: none;
             user-select: none;
-            color: var(--l1-text-light);
-            transition: transform 0.15s;
         }
         &[data-active="true"] > .placeholder {
-            transform: scale(0.8) translateY(-120%) translateX(-10%);
+            transform: scale(0.7) translateY(-130%) translateX(-18.5%);
         }
 
         input {

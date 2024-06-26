@@ -24,37 +24,51 @@
 
     // UI levels
     // The UI is divided into different brightness levels to organize
-    // and show item hierarchy and divide different thing into different
+    // and show item hierarchy and divide different things into different
     // sections, such as widgets, windows, popups, etc...
 
     // Level 1
-    --l1-bg:            #fff;
-    --l1-mc:            #ED7373;
-    --l1-heading:       #272A2B;
-    --l1-text-dark:     #494E53;
-    --l1-text-light:    #92989B;
-    --l1-outline:       #d8e1e6;
-    --l1-highlight:     #F2F7F9;
+    --l0-bg:        #1E1E1E;
+    --l0-fg-bright: #E5E5E5;
+    --l0-fg-dim:    #707070;
+    --l0-accent:    #404040;
+    --l0-section:   #282828;
 
     // Level 2
-    --l2-bg:            #F0F6FB;
-    --l2-mc:            #ED7373;
-    --l2-heading:       #272A2B;
-    --l2-text-dark:     #494E53;
-    --l2-text-light:    #838A8E;
-    --l2-outline:       #BDC8CE;
-    --l2-highlight:     #DFEAF1;
+    --l1-bg:        #292929;
+    --l1-fg-bright: #EEEEEE;
+    --l1-fg-dim:    #7D7D7D;
+    --l1-accent:    #474747;
+    --l1-section:   #353535;
 
+    // Level 3
+    --l2-bg:        #373737;
+    --l2-fg-bright: #FFFFFF;
+    --l2-fg-dim:    #8A8A8A;
+    --l2-accent:    #545454;
+    --l2-section:   #404040;
+
+    // Accent colors
+    --theme-1:      #C92F62;
+    --theme-2:      #D86951;
+
+    --graph-1:      #E3AA67;
+    --graph-2:      #B2CD46;
+
+}
+
+body {
+    background-color: var(--l0-bg);
 }
 
 * {
     font-family: 'Figtree';
+    color: var(--l0-fg-bright);
 }
 
 p {
     letter-spacing: -0.02em;
     line-height: 1.45em;
-    font-size: 0.9rem;
     user-select: none
 }
 
