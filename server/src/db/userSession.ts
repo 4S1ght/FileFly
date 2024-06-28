@@ -50,7 +50,7 @@ export default class UserSession {
     /** Session cleanup timer */
     private static declare sct: NodeJS.Timer
     /** Session ID byte size */
-    private static sidLength = 65
+    public static sidLength = 64
 
     public static async open() {
         this.sct = setInterval(() => {
@@ -150,6 +150,7 @@ export default class UserSession {
         if (!session) return undefined
 
         session.updatedISO = new Date().toISOString()
+        out.DEBUG(`UserSession.renew successful | updated:${session.updatedISO} username:${session.username}`)
         return session
 
     }

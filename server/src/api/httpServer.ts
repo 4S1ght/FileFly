@@ -26,6 +26,7 @@ export type TRequestHandler = (req: express.Request, res: express.Response) => a
 
 // ==== POST HANDLERS ====
 import newSession from './_post/newSession.js'
+import renewSession from './_patch/renewSession.js'
 
 // Code =======================================================================
 
@@ -81,6 +82,7 @@ export default class HttpServer {
         this.app.use('/api/v1', router)
 
         router.post('/session/new', newSession)
+        router.get('/session/renew', renewSession)
 
 
 

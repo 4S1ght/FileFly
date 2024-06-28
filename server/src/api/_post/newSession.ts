@@ -5,7 +5,7 @@ import logging                  from '../../logging/logging.js'
 import z, { string, boolean }   from 'zod'
 import UserSession              from '../../db/userSession.js'
 import type { TRequestHandler } from '../httpServer.js'
-import Config from '../../config/config.js'
+import Config                   from '../../config/config.js'
 
 const out = logging.getScope(import.meta.url)
 
@@ -24,7 +24,7 @@ export type HTTPLoginBody = z.infer<typeof ZRequestBody>
 
 // Code =======================================================================
 
-const POSTLogin: TRequestHandler = async function(req, res) {
+const newSession: TRequestHandler = async function(req, res) {
     try {
 
         const parseStatus = ZRequestBody.safeParse(req.body)
@@ -49,8 +49,9 @@ const POSTLogin: TRequestHandler = async function(req, res) {
         
     } 
     catch (error) {
-        
+        out.ERROR(error as Error)
+        res.status(500).end()
     }
 }
 
-export default POSTLogin
+export default newSession
