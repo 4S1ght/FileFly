@@ -72,7 +72,7 @@ export default class UserSession {
     public static async create(name: string, pass: string, long: boolean): EavAsync<string, Error | 'WRONG_PASS_OR_NAME' | 'SID_GEN_ERROR'> {
         try {
 
-            out.NOTICE(`UserSession.create > name:${name} long:${long}`)
+            out.DEBUG(`UserSession.create > name:${name} long:${long}`)
             
             const account = await UserAccount.get(name)
             if (!account) return ['WRONG_PASS_OR_NAME', undefined]
@@ -97,7 +97,7 @@ export default class UserSession {
             }
 
             this.sessionCache.set(SID, session)
-            out.NOTICE(`UserSession.create > Successful | name:${name} long:${long} userID:${session.userID}`)
+            out.DEBUG(`UserSession.create > Successful | name:${name} long:${long} userID:${session.userID}`)
             return [undefined, SID]
 
         } 

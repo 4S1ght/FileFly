@@ -43,12 +43,12 @@
     }
 
     let awaitingRequest = false
-    let finished = false
+    let loginFinished = false
 
     async function submit(e: Event) {
         if (e.preventDefault) e.preventDefault()
 
-        if (awaitingRequest || finished) return
+        if (awaitingRequest || loginFinished) return
         awaitingRequest = true
 
         const error = await uapi.login(_username, _password, _long)
@@ -56,14 +56,17 @@
         awaitingRequest = false
 
         if (error) {
-            if (error.code === 'UA_BAD_REQUEST')         return setIssue('Server refused to handle the login request.')
-            if (error.code === 'UA_LOGIN_UNKNOWN_ERROR') return setIssue('An unknown client error had ocurred.')
-            if (error.code === 'UA_LOGIN_AUTH_ERROR')    return setIssue('Wrong password or username.')
-            if (error.code === 'UA_SERVER_ERROR')        return setIssue('An unknown server error had ocurred.')
+            if (error.code === 'UA_BAD_REQUEST')      return setIssue('Server refused to handle the login request.')
+            if (error.code === 'UA_LOGIN_AUTH_ERROR') return setIssue('Wrong password or username.')
+            if (error.code === 'US_AUTH_ERROR')       return setIssue('Could not load the user session.')
+            
+            if (['US_SERVER_ERROR', 'UA_SERVER_ERROR'].includes(error.code))      
+                return setIssue('An unknown server error had ocurred.')    
+
             return setIssue('An unknown error had ocurred.')
         }
         else {
-            finished = true
+            loginFinished = true
             setIssue("")  
             await fadeOut()
             _show = false
@@ -132,23 +135,24 @@
                 l2.css.style('opacity', t)
                 l2.css.style('height', g.m.slide(t, 4, 35)+'px')
             })
-            await g.tr(240, 70, f1, t => {
+            await g.tr(240, f1, t => {
                 l2.css.style('opacity', 1-t)
                 l2.css.style('height', g.m.slide(t, 35, 4)+'px')
             })
+            _show = false
         }
-
-        if (!renewed)
-        g('#login-screen > form > *').forEach(async (item, i) => {
-            await g.time(i * 20)
-            const x = g(item)
-            x.css.toInline('transform')
-            await g.tr(400, f1, t => {
-                x.css.transform('translateY', `${g.m.slide(t, 35, 0)}%`)
-                x.css.style('filter', `blur(${g.m.slide(t, 3, 0)}px)`)
-                x.css.style('opacity', `${t}`)
+        else {
+            g('#login-screen > form > *').forEach(async (item, i) => {
+                await g.time(i * 20)
+                const x = g(item)
+                x.css.toInline('transform')
+                await g.tr(400, f1, t => {
+                    x.css.transform('translateY', `${g.m.slide(t, 35, 0)}%`)
+                    x.css.style('filter', `blur(${g.m.slide(t, 3, 0)}px)`)
+                    x.css.style('opacity', `${t}`)
+                })
             })
-        })
+        }
 
     })
 

@@ -14,8 +14,6 @@ const __dirname  = url.fileURLToPath(new URL('.', import.meta.url))
 
 // Types ======================================================================
 
-const ZSID = string().max(UserSession.sidLength * 3)
-
 // Code =======================================================================
 
 const renewSession: TRequestHandler = async function(req, res) {
@@ -23,7 +21,6 @@ const renewSession: TRequestHandler = async function(req, res) {
 
         // Limit SID length
         const sid = req.cookies.sid
-        if (!ZSID.safeParse(sid).success) return res.status(400).end()
 
         const session = UserSession.renew(sid)
         res.status(session ? 200 : 401).end()

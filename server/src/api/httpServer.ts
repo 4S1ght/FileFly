@@ -24,9 +24,10 @@ export type TRequestHandler = (req: express.Request, res: express.Response) => a
 
 // Endpoints ==================================================================
 
-// ==== POST HANDLERS ====
+// ==== SESSION ====
 import newSession from './_post/newSession.js'
 import renewSession from './_patch/renewSession.js'
+import sessionInfo from './_get/sessionInfo.js'
 
 // Code =======================================================================
 
@@ -83,6 +84,7 @@ export default class HttpServer {
 
         router.post('/session/new', newSession)
         router.get('/session/renew', renewSession)
+        router.get('/session/info', sessionInfo)
 
 
 
