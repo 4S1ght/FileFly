@@ -7,6 +7,7 @@
 
     import { g } from 'gilded'
     import { onMount } from "svelte"
+    import { fade } from 'svelte/transition'
 
     import uapi from "../../core/UserAPI"
 
@@ -159,7 +160,7 @@
 </script>
 
 {#if _show}
-    <div id="login-screen">
+    <div id="login-screen" transition:fade={{ duration: 300 }}>
         <form on:submit={submit}>
 
             <h1>Welcome to <span>Filefly</span>!</h1>

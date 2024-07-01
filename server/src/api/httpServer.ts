@@ -26,7 +26,7 @@ export type TRequestHandler = (req: express.Request, res: express.Response) => a
 
 // ==== SESSION ====
 import newSession from './_post/newSession.js'
-import renewSession from './_patch/renewSession.js'
+import renewSession from './_get/renewSession.js'
 import sessionInfo from './_get/sessionInfo.js'
 
 // Code =======================================================================

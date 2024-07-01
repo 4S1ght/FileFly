@@ -3,6 +3,7 @@
     // Components =============================================================
     
     import Login from './views/login/Login.svelte'
+    import Sidebar from './sidebar/Sidebar.svelte'
 
     // Lib ====================================================================
     
@@ -11,7 +12,13 @@
 </script>
 
 <main>
+
+    <!-- Static/fixed elements -->
     <Login/>
+
+    <!-- UI layout -->
+    <Sidebar/>
+
 </main>
 
 <style lang="scss">
