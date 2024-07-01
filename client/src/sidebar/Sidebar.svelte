@@ -26,6 +26,7 @@
         const sb = g(sidebar)
         const sbc = g.m.rgbToHex(window.getComputedStyle(sidebar).borderRightColor)
 
+        // Waits to match with login screen fading off
         await g.time(type === 'new' ? 700 : 1000)
         
         sb.css.style('borderRightColor', '#0000')
@@ -36,7 +37,9 @@
             const e = g(elem)
             e.css.style('opacity', 0)
 
-            await g.time(100 * i)
+            // Staggering
+            await g.time(35 * i)
+
             g.tr(500, f1, t => {
                 e.css.style('opacity', t)
                  .css.transform('translateY', g.m.slide(t, 40, 0) + 'px')

@@ -16,7 +16,8 @@
         display: grid;
         grid-template-columns: min-content 1fr;
         align-items: center;
-        gap: 0.7rem
+        gap: 0.7rem;
+        margin: 1.5rem 0 0.9rem 0;
     }
 
     p {
@@ -25,6 +26,7 @@
         position: relative;
         display: block;
         width: 100%;
+        margin: 0;
     }
 
     span {
