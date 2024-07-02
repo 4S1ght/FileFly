@@ -23,6 +23,9 @@
     --z-login:        1000;
     --z-login-loader: 1001;
 
+    --z-sidebar-shade: 100;
+    --z-sidebar-scroll: 101;
+
     // Element sizing
     --s-body-padding-x: 1.2rem;
     --s-body-padding-y: 1.8rem;
@@ -30,7 +33,6 @@
 
     --s-toolbar-height: 2.6rem;
     --s-toolbar-button-size: 1rem;
-
 
     // UI levels
     // The UI is divided into different brightness levels to organize
@@ -65,12 +67,15 @@
     --graph-1:      #E3AA67;
     --graph-2:      #B2CD46;
 
+    --scrollbar-thumb: #ffffff30;
+
 }
 
 body {
     background-color: var(--l0-bg);
     padding: var(--s-body-padding-y) var(--s-body-padding-x);
     margin: 0;  
+    overflow: hidden;
 }
 
 * {
@@ -91,4 +96,10 @@ h1, h2, h3, h4, h5, h6, button, span {
 
 p, a, button {
     font-size: 1rem;
+}
+
+// Scrolling ==================================================================
+
+.simplebar-scrollbar:before {
+    background-color: var(--scrollbar-thumb) !important;
 }

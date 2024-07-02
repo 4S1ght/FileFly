@@ -2,14 +2,19 @@
 
     // imports ================================================================
 
-    import UserAPI from "../core/UserAPI"
     import type { TSessionInfo } from "../../../server/src/api/_get/sessionInfo"
+
+    import UserAPI from "../core/UserAPI"
+    import { onMount } from "svelte"
     import { g } from "gilded"
-    import Section from "./Section.svelte";
+    import SimpleBar from "simplebar"
+
+    import Section from "./Section.svelte"
 
     // State ==================================================================
 
     let sidebar: HTMLDivElement
+    let sidebarContent: HTMLDivElement
 
     let _si: TSessionInfo | undefined
     UserAPI.sessionInfo.subscribe(si => _si = si)
@@ -19,6 +24,13 @@
 
     // Animations =============================================================
 
+    onMount(() => {
+        const x = new SimpleBar(sidebarContent, {
+            clickOnTrack: false,
+        })
+    })
+
+    // Mounting ===============================================================
 
     UserAPI.on('successful-login', async (type) => {
 
@@ -32,7 +44,7 @@
         sb.css.style('borderRightColor', '#0000')
         g.tr(500, f1, t => sb.css.style('borderRightColor', g.m.hexTransform(t, `${sbc}00`, sbc)))
 
-        g(Array.from(sidebar.children)).forEach(async (elem, i) => {
+        g(`.${sidebar.className.replace(' ', '.')} .stagger`).forEach(async (elem, i) => {
 
             const e = g(elem)
             e.css.style('opacity', 0)
@@ -53,7 +65,7 @@
 
 <div class="sidebar" bind:this={sidebar}>
 
-    <div class="home">
+    <div class="home stagger">
         <p class="username">
             {_username}
             <span>{_root ? 'Administrator' : ''}</span>
@@ -61,8 +73,11 @@
         <i class="home-button fa-solid fa-house"></i>
     </div>
 
-    <Section name="Pins"/>
-
+    <div class="content" bind:this={sidebarContent}>
+        <Section name="Pins"/>
+        <Section name="Locations"/>
+    </div>
+    
 </div>
 
 <style lang="scss">
@@ -97,6 +112,36 @@
             }
 
         }
+
+        .content {
+            width: 100%;
+            height: calc(100vh - var(--s-toolbar-height) - var(--s-body-padding-y)*2 - 1.4rem);
+            margin: 0.7rem 0;
+            position: relative;
+
+            :global(.simplebar-track) {
+                z-index: var(--z-sidebar-scroll) !important;
+            }
+
+            &::before, &::after {
+                content: '';
+                display: block;
+                height: 1rem;
+                width: 100%;
+                position: absolute;
+                z-index: var(--z-sidebar-shade);
+            }
+
+            &::before { 
+                top: 0; 
+                background: linear-gradient(to bottom, var(--l0-bg), #0000)
+            }
+            &::after { 
+                bottom: 0; 
+                background: linear-gradient(to top, var(--l0-bg), #0000)
+            }
+        }
+
     }
 
 </style>

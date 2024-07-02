@@ -1,6 +1,7 @@
 // Global CSS =================================================================
 
 import './app.scss'
+import 'simplebar/dist/simplebar.css'
 
 // Fontawesome Icons ==========================================================
 
@@ -12,7 +13,7 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 library.add(fas, far, fab)
 dom.watch()
 
-// APp ========================================================================
+// App ========================================================================
 
 // @ts-ignore - Type declaration issues. Yey.
 import App from './App.svelte'
