@@ -39,7 +39,7 @@
         const sbc = g.m.rgbToHex(window.getComputedStyle(sidebar).borderRightColor)
 
         // Waits to match with login screen fading off
-        await g.time(type === 'new' ? 700 : 1000)
+        await g.time(type === 'new' ? 600 : 1000)
         
         sb.css.style('borderRightColor', '#0000')
         g.tr(500, f1, t => sb.css.style('borderRightColor', g.m.hexTransform(t, `${sbc}00`, sbc)))
