@@ -4,7 +4,7 @@
 
     import type { TSessionInfo } from "../../../server/src/api/_get/sessionInfo"
 
-    import UserAPI from "../core/UserAPI"
+    import uapi from "../core/UserAPI"
     import { onMount } from "svelte"
     import { g } from "gilded"
     import SimpleBar from "simplebar"
@@ -17,7 +17,7 @@
     let sidebarContent: HTMLDivElement
 
     let _si: TSessionInfo | undefined
-    UserAPI.sessionInfo.subscribe(si => _si = si)
+    uapi.sessionInfo.subscribe(si => _si = si)
 
     $: _username = _si ? _si.username : ''
     $: _root     = _si ? _si.root : ''
@@ -32,7 +32,7 @@
 
     // Mounting ===============================================================
 
-    UserAPI.on('successful-login', async (type) => {
+    uapi.on('successful-login', async (type) => {
 
         const f1 = g.f.easeOutCirc
         const sb = g(sidebar)
@@ -68,14 +68,43 @@
     <div class="home stagger">
         <p class="username">
             {_username}
-            <span>{_root ? 'Administrator' : ''}</span>
+            <span>{_root ? 'Administrator' : 'User'}</span>
         </p>
         <i class="home-button fa-solid fa-house"></i>
     </div>
 
     <div class="content" bind:this={sidebarContent}>
-        <Section name="Pins"/>
-        <Section name="Locations"/>
+        <Section name="Storage" iconStyle="fa" icon="fa-hard-drive">
+            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Repudiandae expedita officiis dolorem autem eos a exercitationem quas magnam ipsam. Nostrum adipisci rerum nisi, pariatur soluta excepturi necessitatibus ut voluptates facilis inventore, asperiores nam nulla, at nesciunt. Aperiam voluptatum dolor natus.</p>
+        </Section>
+        <Section name="Pinned" iconStyle="fa" icon="fa-star"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
+        <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
     </div>
     
 </div>
@@ -83,10 +112,14 @@
 <style lang="scss">
 
     .sidebar {
+        --pad: 1.5rem;
         height: calc(100vh - var(--s-body-padding-y) * 2);
-        width: calc(var(--s-sidebar-width) - 1.5rem);
+        width: calc(var(--s-sidebar-width));
         border-right: solid 1px var(--l0-section);
-        padding-right: 1.5rem;
+
+        & > * {
+            padding-right: var(--pad);
+        }
 
         .home {
             display: grid;
@@ -114,10 +147,11 @@
         }
 
         .content {
-            width: 100%;
+            width: calc(100% - var(--pad));
             height: calc(100vh - var(--s-toolbar-height) - var(--s-body-padding-y)*2 - 1.4rem);
             margin: 0.7rem 0;
             position: relative;
+            padding-right: 1rem;
 
             :global(.simplebar-track) {
                 z-index: var(--z-sidebar-scroll) !important;
@@ -126,7 +160,7 @@
             &::before, &::after {
                 content: '';
                 display: block;
-                height: 1rem;
+                height: 0.8rem;
                 width: 100%;
                 position: absolute;
                 z-index: var(--z-sidebar-shade);

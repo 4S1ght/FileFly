@@ -103,3 +103,7 @@ p, a, button {
 .simplebar-scrollbar:before {
     background-color: var(--scrollbar-thumb) !important;
 }
+.simplebar-content-wrapper {
+    outline: none !important;
+    user-select: none !important;
+}
