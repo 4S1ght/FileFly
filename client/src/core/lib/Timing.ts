@@ -18,6 +18,14 @@ export default {
             }
         }
         return () => play()
+    },
+
+    /**
+     * Plays the callback immediately using a 0-delay timeout.  
+     * This is used to desync updates from svelte re-renders.
+     */
+    immediate: (callback: () => any) => {
+        setTimeout(callback, 0);
     }
 
 }

@@ -10,6 +10,7 @@
     import SimpleBar from "simplebar"
 
     import Section from "./Section.svelte"
+    import SectionItem from "./SectionItem.svelte"
 
     // State ==================================================================
 
@@ -74,8 +75,11 @@
     </div>
 
     <div class="content" bind:this={sidebarContent}>
-        <Section name="Storage" iconStyle="fa" icon="fa-hard-drive">
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Repudiandae expedita officiis dolorem autem eos a exercitationem quas magnam ipsam. Nostrum adipisci rerum nisi, pariatur soluta excepturi necessitatibus ut voluptates facilis inventore, asperiores nam nulla, at nesciunt. Aperiam voluptatum dolor natus.</p>
+        <Section name="Storage" iconStyle="fa" icon="fa-hard-drive" open={true}>
+            <SectionItem>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit, commodi!</p>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit, commodi!</p>
+            </SectionItem>
         </Section>
         <Section name="Pinned" iconStyle="fa" icon="fa-star"/>
         <Section name="Pins" iconStyle="fa" icon="fa-folder"/>
@@ -141,7 +145,8 @@
 
             .home-button {
                 font-size: var(--s-toolbar-button-size);
-                :global(*) { fill: var(--l0-fg-dim); }
+                cursor: pointer;
+                :global(path) { fill: var(--l0-fg-dim); }
             }
 
         }

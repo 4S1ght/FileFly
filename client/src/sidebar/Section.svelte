@@ -1,9 +1,11 @@
 <script lang="ts">
+    
 
     // Imports ================================================================
 
+    import { onMount, afterUpdate, beforeUpdate } from "svelte"
+
     import Timing from "../core/lib/Timing"
-    import { g } from "gilded"
 
     // State ==================================================================
 
@@ -11,10 +13,10 @@
     export let iconStyle: 'fa' | 'fas' | 'far' | 'fab' = 'fa'
     export let icon: string
 
-    export let closed: boolean = false
-    export let onToggle: (closed: boolean) => any = () => {}
+    export let open: boolean = false
+    export let onToggle: (open: boolean) => any = () => {}
 
-    let _closed = closed
+    let _open = open
 
     // Interactions ===========================================================
 
@@ -24,10 +26,7 @@
     let header: HTMLDivElement
     let content: HTMLDivElement
 
-    const toggle = Timing.throttle(toggleTime, () => {
-
-        _closed = !_closed
-        onToggle(_closed)
+    const applyToggleStyling = () => {
 
         const headerHeight = getComputedStyle(header).height
         const headerPT = getComputedStyle(header).paddingTop
@@ -41,23 +40,34 @@
         const contentMB = getComputedStyle(content).marginBottom
         const cs = `${contentHeight} + ${contentPT} + ${contentPB} + ${contentMT} + ${contentMB}`
 
-        console.log(hs, '|||', cs)
+        section.style.maxHeight = _open
+            ? `calc(${hs} + ${cs})`
+            : `calc(${hs})`
 
-        section.style.maxHeight = _closed
-            ? `calc(${hs})`
-            : `calc(${hs} + ${cs})`
+    }
 
+    const toggle = Timing.throttle(toggleTime, () => {
+        _open = !_open
+        onToggle(_open)
+        applyToggleStyling()
     })
+
+    afterUpdate(() => Timing.immediate(applyToggleStyling))
+    onMount(() => Timing.immediate(applyToggleStyling))
 
 </script>
 
-<div class="section stagger" data-closed={_closed} bind:this={section}>
+<div class="section stagger" data-open={_open} bind:this={section}>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="header" on:click={toggle} bind:this={header}>
         <div class="icon">
-            <i class="active-icon fa-solid fa-chevron-right"></i>
-            <i class="resting-icon {iconStyle} {icon}"></i>
+            <div class="active-icon">
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+            <div class="resting-icon">
+                <i class="{iconStyle} {icon}"></i>
+            </div>
         </div>
         <p class="name">{name}</p>
         <div class="line"></div>
@@ -98,8 +108,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            :global(svg path) { color: var(--l0-accent); }
-            .active-icon { transition: transform 0.2s; }
+            position: relative; 
+            > div {
+                position: absolute;
+            }
+            :global(svg) {
+                transition: transform 0.3s;
+            }
+            :global(svg path) { 
+                color: var(--l0-accent); 
+            }
+            .active-icon {
+                transition: transform 0.3s, opacity 0.3s;
+                transform: translateY(70%);
+            }
+            .resting-icon {
+                transition: transform 0.3s, opacity 0.3s;
+                transform: translateY(0%);
+            }
+
         }
     
         .name {
@@ -114,7 +141,7 @@
         }
 
         .content {
-            padding: 0.5rem 0.5rem 0 0.5rem;
+            padding-top: 0.4rem;
             & > :global(*:first-child) {
                 margin-top: 0 !important;
             }
@@ -123,20 +150,20 @@
         // State ==========================================
 
         .icon > .active-icon {
-            display: none;
+            opacity: 0;
         }
-        &:hover {
+        .header:hover {
+            background-color: var(--l1-bg);
             // Icon swap
-            .icon .active-icon { display: initial; }
-            .icon .resting-icon { display: none; }
+            .icon .active-icon { opacity: 1; transform: translateY(0%); }
+            .icon .resting-icon { opacity: 0; transform: translateY(-70%); }
             // Color swap
-            .header { background-color: var(--l0-section); }
             .icon :global(svg path) { color: var(--l1-fg-dim); }
             .name { color: var(--l1-fg-dim); }
             .line { opacity: 0 }
         }
-        &[data-closed="false"] .icon > .active-icon {
-            transform: rotate(90deg);
+        &[data-open="true"] .icon > .active-icon :global(svg) {
+            transform: rotate(90deg) !important;
         }
 
     }
