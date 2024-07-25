@@ -156,7 +156,7 @@
             height: calc(100vh - var(--s-toolbar-height) - var(--s-body-padding-y)*2 - 1.4rem);
             margin: 0.7rem 0;
             position: relative;
-            padding-right: 1rem;
+            padding-right: 1.07rem;
 
             :global(.simplebar-track) {
                 z-index: var(--z-sidebar-scroll) !important;

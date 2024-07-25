@@ -100,8 +100,9 @@
             grid-template-columns: 1rem min-content 1fr;
             align-items: center;
             gap: 0.5rem;
-            cursor: pointer;
             border-radius: 0.8rem;
+            transition: background-color .15s;
+            cursor: pointer;
         }
 
         .icon {
@@ -160,11 +161,14 @@
             // Color swap
             .icon :global(svg path) { color: var(--l1-fg-dim); }
             .name { color: var(--l1-fg-dim); }
-            .line { opacity: 0 }
         }
         &[data-open="true"] .icon > .active-icon :global(svg) {
             transform: rotate(90deg) !important;
         }
+        &[data-open="false"] .line {
+            width: 0%;
+        }
+
 
     }
 
