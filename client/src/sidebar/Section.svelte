@@ -52,8 +52,10 @@
         applyToggleStyling()
     })
 
-    afterUpdate(() => Timing.immediate(applyToggleStyling))
-    onMount(() => Timing.immediate(applyToggleStyling))
+    onMount(() => Timing.immediate(() => {
+        applyToggleStyling()
+        new ResizeObserver(applyToggleStyling).observe(content)
+    }))
 
 </script>
 
@@ -121,7 +123,7 @@
             }
             .active-icon {
                 transition: transform 0.3s, opacity 0.3s;
-                transform: translateY(70%);
+                transform: translateY(70%) scale(0.3);
             }
             .resting-icon {
                 transition: transform 0.3s, opacity 0.3s;
@@ -156,8 +158,8 @@
         .header:hover {
             background-color: var(--l1-bg);
             // Icon swap
-            .icon .active-icon { opacity: 1; transform: translateY(0%); }
-            .icon .resting-icon { opacity: 0; transform: translateY(-70%); }
+            .icon .active-icon { opacity: 1; transform: translateY(0%) scale(1); }
+            .icon .resting-icon { opacity: 0; transform: translateY(-70%) scale(0.3); }
             // Color swap
             .icon :global(svg path) { color: var(--l1-fg-dim); }
             .name { color: var(--l1-fg-dim); }
