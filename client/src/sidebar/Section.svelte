@@ -23,8 +23,6 @@
 
     const toggleTime = 300
 
-    let section: HTMLDivElement
-    let header: HTMLDivElement
     let content: HTMLDivElement
     let contentInner: HTMLDivElement
 
@@ -57,10 +55,10 @@
 
 </script>
 
-<div class="section stagger" data-open={_open} bind:this={section}>
+<div class="section stagger" data-open={_open}>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="header" on:click={toggle} bind:this={header}>
+    <div class="header" on:click={toggle}>
         <div class="icon">
             <div class="active-icon">
                 <i class="fa-solid fa-chevron-right"></i>
