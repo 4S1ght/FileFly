@@ -16,6 +16,7 @@
     export let open: boolean = false
     export let onToggle: (open: boolean) => any = () => {}
 
+    let mounted = true
     let _open = open
 
     // Interactions ===========================================================
@@ -25,24 +26,20 @@
     let section: HTMLDivElement
     let header: HTMLDivElement
     let content: HTMLDivElement
+    let contentInner: HTMLDivElement
 
     const applyToggleStyling = () => {
 
-        const headerHeight = getComputedStyle(header).height
-        const headerPT = getComputedStyle(header).paddingTop
-        const headerPB = getComputedStyle(header).paddingBottom
-        const hs = `${headerHeight} + ${headerPT} + ${headerPB}`
+        if (!mounted) return
 
-        const contentHeight = getComputedStyle(content).height
-        const contentPT = getComputedStyle(content).paddingTop
-        const contentPB = getComputedStyle(content).paddingBottom
-        const contentMT = getComputedStyle(content).marginTop
-        const contentMB = getComputedStyle(content).marginBottom
+        const contentHeight = getComputedStyle(contentInner).height
+        const contentPT = getComputedStyle(contentInner).paddingTop
+        const contentPB = getComputedStyle(contentInner).paddingBottom
+        const contentMT = getComputedStyle(contentInner).marginTop
+        const contentMB = getComputedStyle(contentInner).marginBottom
         const cs = `${contentHeight} + ${contentPT} + ${contentPB} + ${contentMT} + ${contentMB}`
 
-        section.style.maxHeight = _open
-            ? `calc(${hs} + ${cs})`
-            : `calc(${hs})`
+        content.style.maxHeight = _open ? `calc(${cs})` : '0'
 
     }
 
@@ -53,8 +50,9 @@
     })
 
     onMount(() => Timing.immediate(() => {
+        mounted = true
         applyToggleStyling()
-        new ResizeObserver(applyToggleStyling).observe(content)
+        new ResizeObserver(applyToggleStyling).observe(contentInner)
     }))
 
 </script>
@@ -76,7 +74,9 @@
     </div>
 
     <div class="content" bind:this={content}>
-        <slot/>
+        <div class="content-inner" bind:this={contentInner}>
+            <slot/>
+        </div>
     </div>
 
 </div>
@@ -87,9 +87,6 @@
         width: 100%;
         gap: 0.7rem;
         margin: 1rem 0 0.5rem 0;
-        max-height: 39px;
-        transition: max-height 0.3s;
-        overflow: hidden;
 
         &:first-child {
             margin-top: 0.8rem;
@@ -144,7 +141,9 @@
         }
 
         .content {
-            padding-top: 0.4rem;
+            margin-top: 0.4rem;
+            transition: max-height 0.3s;
+            overflow: hidden;
             & > :global(*:first-child) {
                 margin-top: 0 !important;
             }
