@@ -81,21 +81,25 @@ body {
 * {
     font-family: 'Figtree';
     color: var(--l0-fg-bright);
+    user-select: none
 }
 
 p {
     letter-spacing: -0.02em;
     line-height: 1.45em;
-    user-select: none
 }
 
 h1, h2, h3, h4, h5, h6, button, span {
     letter-spacing: 0.01em;
-    user-select: none
+    user-select: none;
 }
 
 p, a, button {
     font-size: 1rem;
+}
+
+input {
+    user-select: auto;
 }
 
 // Scrolling ==================================================================

@@ -92,6 +92,7 @@
             border: none;
             outline: none;
             user-select: all;
+            font-size: 1rem;
         }
 
     }
